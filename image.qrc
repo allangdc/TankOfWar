@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/image/tank">
+        <file>image/yellow.png</file>
+    </qresource>
+    <qresource prefix="/image/buttons">
+        <file>image/arrow_blue.png</file>
+        <file>image/arrow_silver.png</file>
+    </qresource>
+</RCC>
