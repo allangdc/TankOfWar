@@ -10,7 +10,7 @@ GameViewer::GameViewer(bool fullscreen): QGraphicsView()
     sc_game = new SceneGame();
     this->setScene(sc_game);
     if(!fullscreen) {
-        geometry = QRect(0,0,300,400);
+        geometry = QRect(0,0,526,701);
     } else {
         geometry = QApplication::desktop()->screenGeometry();
     }

@@ -12,7 +12,7 @@ class SceneGame: public QGraphicsScene
 {
 public:
     SceneGame();
-    void MoveTank(int action);
+    void MoveTank(unsigned char action);
     void LoadObjects();
 protected:
     int id_tank=0;
