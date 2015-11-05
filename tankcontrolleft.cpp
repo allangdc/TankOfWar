@@ -1,24 +1,13 @@
 #include "tankcontrolleft.h"
-#include <QMouseEvent>
+#include <QPixmap>
 
 TankControlLeft::TankControlLeft(Tank *tank): TankControlButton(tank)
 {
-    setText("<<");
+    this->setRotation(90);
 }
 
-void TankControlLeft::mousePressEvent(QMouseEvent *e)
+void TankControlLeft::Click(bool is_pressed)
 {
-    QPushButton::mousePressEvent(e);
-    if(e->button() == Qt::LeftButton) {
-        //tank->RotateLeft(true);
-    }
+    TankControlButton::Click(is_pressed);
+    tank->RotateLeft(is_pressed);
 }
-
-void TankControlLeft::mouseReleaseEvent(QMouseEvent *e)
-{
-    QPushButton::mouseReleaseEvent(e);
-    if(e->button() == Qt::LeftButton) {
-        tank->RotateLeft(false);
-    }
-}
-

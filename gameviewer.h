@@ -11,7 +11,7 @@ public:
     GameViewer(bool fullscreen=false);
     void show();
 protected:
-
+    //void keyPressEvent(QKeyEvent *event);
 private:
     SceneGame *sc_game;
     QRect geometry;

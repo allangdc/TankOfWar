@@ -1,24 +1,14 @@
 #include "tankcontrolforward.h"
-#include <QMouseEvent>
+#include <QPixmap>
 
 TankControlForward::TankControlForward(Tank *tank): TankControlButton(tank)
 {
-    setText("||");
+    this->setRotation(180);
 }
 
-void TankControlForward::mousePressEvent(QMouseEvent *e)
+void TankControlForward::Click(bool is_pressed)
 {
-    QPushButton::mousePressEvent(e);
-    if(e->button() == Qt::LeftButton) {
-        tank->MoveFoward(true);
-    }
-}
-
-void TankControlForward::mouseReleaseEvent(QMouseEvent *e)
-{
-    QPushButton::mouseReleaseEvent(e);
-    if(e->button() == Qt::LeftButton) {
-        tank->MoveFoward(false);
-    }
+    TankControlButton::Click(is_pressed);
+    tank->MoveFoward(is_pressed);
 }
 

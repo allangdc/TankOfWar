@@ -18,10 +18,11 @@ public:
     void LoadObjects();
 protected:
     int id_tank=0;
-    void keyPressEvent(QKeyEvent *e);
-    bool event(QEvent *event);
     QVector<Tank *> tanks;
     QVector<TankControlButton *> tank_buttons;
+    virtual void keyPressEvent(QKeyEvent *event);
+    virtual void keyReleaseEvent(QKeyEvent *event);
+    void WantClose();
 };
 
 #endif // SCENEGAME_H

@@ -8,8 +8,7 @@ class TankControlLeft: public TankControlButton
 public:
     TankControlLeft(Tank *tank);
 protected:
-    virtual void mousePressEvent(QMouseEvent *e);
-    virtual void mouseReleaseEvent(QMouseEvent *e);
+    void Click(bool is_pressed);
 };
 
 #endif // TANKCONTROLLEFT_H

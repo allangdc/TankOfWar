@@ -1,19 +1,18 @@
 #include "scenegame.h"
 
-#include <QKeyEvent>
 #include <QObject>
-#include <QDebug>''
-#include <iostream>
+#include <QDebug>
+#include <QApplication>
+#include <QKeyEvent>
+#include <QMessageBox>
 
 #include "tankcontrolbutton.h"
 #include "tankcontrolleft.h"
 #include "tankcontrolright.h"
 #include "tankcontrolforward.h"
-#include <QTouchEvent>
 
-SceneGame::SceneGame()
+SceneGame::SceneGame() : QGraphicsScene()
 {
-
 }
 
 void SceneGame::LoadObjects()
@@ -32,92 +31,59 @@ void SceneGame::LoadObjects()
     const int space = 30;
 
     TankControlLeft *bleft = new TankControlLeft(t1);
-    bleft->move(space, this->height()-bleft->size().height()-space);
-    addWidget(bleft);
+    bleft->setPos(space, this->height()-bleft->Size().height()-space);
+    addItem(bleft);
     tank_buttons.push_back(bleft);
 
     TankControlRight *bright = new TankControlRight(t1);
-    bright->move(this->width() - bright->size().width() - space, this->height()-bright->size().height()-space);
-    addWidget(bright);
+    bright->setPos(this->width() - bright->Size().width() - space, this->height()-bright->Size().height()-space);
+    addItem(bright);
     tank_buttons.push_back(bright);
 
     TankControlForward *bforward = new TankControlForward(t1);
-    bforward->move(this->width()/2 - bforward->size().width()/2, this->height()-bforward->size().height()-space);
-    addWidget(bforward);
+    bforward->setPos(this->width()/2 - bforward->Size().width()/2, this->height()-bforward->Size().height()-space);
+    addItem(bforward);
     tank_buttons.push_back(bforward);
 }
 
-void SceneGame::keyPressEvent(QKeyEvent *e)
+void SceneGame::keyPressEvent(QKeyEvent *event)
 {
-    Tank *tank = tanks.at(1);
-    switch(e->key()) {
-    case Qt::Key_Left:
-        tank->RotateLeft();
-        break;
-    case Qt::Key_Right:
-        tank->RotateRight();
-        break;
-    case Qt::Key_Up:
-        tank->MoveFoward();
-        break;
+    if(event->isAutoRepeat()) {
+        return;
     }
+
+    if(event->key() == Qt::Key_Back || event->key() == Qt::Key_Q)
+        WantClose();
+
+    if(event->key() == Qt::Key_Left)
+        tank_buttons.at(0)->Click(true);
+    if(event->key() == Qt::Key_Right)
+        tank_buttons.at(1)->Click(true);
+    if(event->key() == Qt::Key_Up)
+        tank_buttons.at(2)->Click(true);
 }
 
-bool SceneGame::event(QEvent *event)
+void SceneGame::keyReleaseEvent(QKeyEvent *event)
 {
-    switch (event->type()) {
-    case QEvent::TouchBegin:
-    case QEvent::TouchUpdate:
-    case QEvent::TouchEnd:
-    {
-        QList<QTouchEvent::TouchPoint> pts = static_cast<QTouchEvent *>(event)->touchPoints();
-        for(QList<QTouchEvent::TouchPoint>::iterator it=pts.begin(); it != pts.end(); it++) {
-            QRectF rectf = it->rect();
-            if (rectf.isEmpty()) {
-                qreal diameter = qreal(50) * it->pressure();
-                rectf.setSize(QSizeF(diameter, diameter));
-            }
-            QRect rect = rectf.toRect();
+    if(event->isAutoRepeat()) {
+        return;
+    }
 
-            switch(it->state()) {
-                case Qt::TouchPointStationary:
-                    continue;
-                case Qt::TouchPointReleased:
-                    if(!rect.intersected(tank_buttons.at(0)->geometry()).isEmpty()) {
-                        tanks.at(0)->RotateLeft(false);
-                    } else if(!rect.intersected(tank_buttons.at(1)->geometry()).isEmpty()) {
-                        tanks.at(0)->RotateRight(false);
-                    } else if(!rect.intersected(tank_buttons.at(2)->geometry()).isEmpty()) {
-                        tanks.at(0)->MoveFoward(false);
-                    }
-                    break;
-                case Qt::TouchPointMoved:
-                    if(!rect.intersected(tank_buttons.at(0)->geometry()).isEmpty()) {
-                        tanks.at(0)->RotateLeft(true);
-                    } else if(!rect.intersected(tank_buttons.at(1)->geometry()).isEmpty()) {
-                        tanks.at(0)->RotateRight(true);
-                    } else if(!rect.intersected(tank_buttons.at(2)->geometry()).isEmpty()) {
-                        tanks.at(0)->MoveFoward(true);
-                    } else {
-                        tanks.at(0)->MoveStop();
-                    }
-                    break;
-                default:
-                    if(!rect.intersected(tank_buttons.at(0)->geometry()).isEmpty()) {
-                        tanks.at(0)->RotateLeft(true);
-                    } else if(!rect.intersected(tank_buttons.at(1)->geometry()).isEmpty()) {
-                        tanks.at(0)->RotateRight(true);
-                    } else if(!rect.intersected(tank_buttons.at(2)->geometry()).isEmpty()) {
-                        tanks.at(0)->MoveFoward(true);
-                    }
-                    break;
-            }
-        }
-        break;
+    if(event->key() == Qt::Key_Left)
+        tank_buttons.at(0)->Click(false);
+    if(event->key() == Qt::Key_Right)
+        tank_buttons.at(1)->Click(false);
+    if(event->key() == Qt::Key_Up)
+        tank_buttons.at(2)->Click(false);
+}
+
+void SceneGame::WantClose()
+{
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(NULL, "TankOfWar", "Deseja Sair?",
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+      QApplication::quit();
     }
-    default:
-        return QGraphicsScene::event(event);
-    }
-    return true;
 }
 
