@@ -3,10 +3,12 @@
 
 #include <QGraphicsScene>
 #include <QVector>
-#include <QTimer>
 #include "tank.h"
+#include "tankcontrolbutton.h"
 
-class Button;
+class TankControlLeft;
+class TankControlRight;
+class TankControlForward;
 
 class SceneGame: public QGraphicsScene
 {
@@ -17,9 +19,9 @@ public:
 protected:
     int id_tank=0;
     void keyPressEvent(QKeyEvent *e);
+    bool event(QEvent *event);
     QVector<Tank *> tanks;
-    Button *btn_left, *btn_right, *btn_forward;
-    QTimer *timer_tank;
+    QVector<TankControlButton *> tank_buttons;
 };
 
 #endif // SCENEGAME_H

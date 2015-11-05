@@ -1,4 +1,5 @@
 #include "tankcontrolbutton.h"
+#include <QTouchEvent>
 
 TankControlButton::TankControlButton(Tank *tank) : QPushButton()
 {

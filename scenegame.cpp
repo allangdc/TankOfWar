@@ -7,29 +7,13 @@
 
 #include "tankcontrolbutton.h"
 #include "tankcontrolleft.h"
+#include "tankcontrolright.h"
+#include "tankcontrolforward.h"
+#include <QTouchEvent>
 
 SceneGame::SceneGame()
 {
 
-}
-
-void SceneGame::MoveTank(unsigned char action)
-{
-    Tank *tank = tanks.at(id_tank);
-
-    unsigned char aux = action & GO_STOP;
-
-
-    bool run = aux==(unsigned char)GO_STOP?false:true;
-    std::cout << "run=" << run << std::endl;
-
-    aux = action & GO_FORWARD;
-    if(aux == (unsigned char) GO_FORWARD)
-        tank->MoveFoward(run);
-    if((aux=action & GO_LEFT) == GO_LEFT)
-        tank->RotateLeft(run);
-    if((aux=action & GO_RIGHT) == GO_RIGHT)
-        tank->RotateRight(run);
 }
 
 void SceneGame::LoadObjects()
@@ -49,18 +33,18 @@ void SceneGame::LoadObjects()
 
     TankControlLeft *bleft = new TankControlLeft(t1);
     bleft->move(space, this->height()-bleft->size().height()-space);
-    bleft->setText("<<");
     addWidget(bleft);
+    tank_buttons.push_back(bleft);
 
-    TankControlButton *bright = new TankControlButton(t1);
+    TankControlRight *bright = new TankControlRight(t1);
     bright->move(this->width() - bright->size().width() - space, this->height()-bright->size().height()-space);
-    bright->setText(">>");
     addWidget(bright);
+    tank_buttons.push_back(bright);
 
-    TankControlButton *bforward = new TankControlButton(t1);
+    TankControlForward *bforward = new TankControlForward(t1);
     bforward->move(this->width()/2 - bforward->size().width()/2, this->height()-bforward->size().height()-space);
-    bforward->setText("|");
     addWidget(bforward);
+    tank_buttons.push_back(bforward);
 }
 
 void SceneGame::keyPressEvent(QKeyEvent *e)
@@ -77,5 +61,63 @@ void SceneGame::keyPressEvent(QKeyEvent *e)
         tank->MoveFoward();
         break;
     }
+}
+
+bool SceneGame::event(QEvent *event)
+{
+    switch (event->type()) {
+    case QEvent::TouchBegin:
+    case QEvent::TouchUpdate:
+    case QEvent::TouchEnd:
+    {
+        QList<QTouchEvent::TouchPoint> pts = static_cast<QTouchEvent *>(event)->touchPoints();
+        for(QList<QTouchEvent::TouchPoint>::iterator it=pts.begin(); it != pts.end(); it++) {
+            QRectF rectf = it->rect();
+            if (rectf.isEmpty()) {
+                qreal diameter = qreal(50) * it->pressure();
+                rectf.setSize(QSizeF(diameter, diameter));
+            }
+            QRect rect = rectf.toRect();
+
+            switch(it->state()) {
+                case Qt::TouchPointStationary:
+                    continue;
+                case Qt::TouchPointReleased:
+                    if(!rect.intersected(tank_buttons.at(0)->geometry()).isEmpty()) {
+                        tanks.at(0)->RotateLeft(false);
+                    } else if(!rect.intersected(tank_buttons.at(1)->geometry()).isEmpty()) {
+                        tanks.at(0)->RotateRight(false);
+                    } else if(!rect.intersected(tank_buttons.at(2)->geometry()).isEmpty()) {
+                        tanks.at(0)->MoveFoward(false);
+                    }
+                    break;
+                case Qt::TouchPointMoved:
+                    if(!rect.intersected(tank_buttons.at(0)->geometry()).isEmpty()) {
+                        tanks.at(0)->RotateLeft(true);
+                    } else if(!rect.intersected(tank_buttons.at(1)->geometry()).isEmpty()) {
+                        tanks.at(0)->RotateRight(true);
+                    } else if(!rect.intersected(tank_buttons.at(2)->geometry()).isEmpty()) {
+                        tanks.at(0)->MoveFoward(true);
+                    } else {
+                        tanks.at(0)->MoveStop();
+                    }
+                    break;
+                default:
+                    if(!rect.intersected(tank_buttons.at(0)->geometry()).isEmpty()) {
+                        tanks.at(0)->RotateLeft(true);
+                    } else if(!rect.intersected(tank_buttons.at(1)->geometry()).isEmpty()) {
+                        tanks.at(0)->RotateRight(true);
+                    } else if(!rect.intersected(tank_buttons.at(2)->geometry()).isEmpty()) {
+                        tanks.at(0)->MoveFoward(true);
+                    }
+                    break;
+            }
+        }
+        break;
+    }
+    default:
+        return QGraphicsScene::event(event);
+    }
+    return true;
 }
 

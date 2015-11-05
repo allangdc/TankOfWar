@@ -12,40 +12,41 @@ Tank::Tank() : QGraphicsPixmapItem()
                                                               Qt::SmoothTransformation));  //imagem do tanque;
     setTransformOriginPoint(this->pixmap().width()/2, this->pixmap().height()/2);   //define o ponto de rotação
     setRotation(0);
-    action = STOP;
     setInterval(100);
+    direction=0;
+    forward = false;
 }
 
 void Tank::RotateLeft(bool run)
 {
     if(run)
-        action |= GO_LEFT;
-    else
-        action &= ~GO_LEFT;
+        direction = -1;
+    else if(direction<0) {
+        direction = 0;
+    }
     this->start();
 }
 
 void Tank::RotateRight(bool run)
 {
     if(run)
-        action |= GO_RIGHT;
-    else
-        action &= ~GO_RIGHT;
+        direction = 1;
+    else if(direction>0) {
+        direction = 0;
+    }
     this->start();
 }
 
 void Tank::MoveFoward(bool run)
 {
-    if(run)
-        action |= GO_FORWARD;
-    else
-        action &= ~GO_FORWARD;
+    forward = run;
     this->start();
 }
 
 void Tank::MoveStop()
 {
-    action = STOP;
+    forward = false;
+    direction = 0;
 }
 
 void Tank::SetOrientation(QPoint position, double angle)
@@ -60,23 +61,18 @@ void Tank::SetOrientation(int x, int y, double angle)
     setRotation(angle);
 }
 
-int Tank::Action()
-{
-    return action;
-}
-
 void Tank::timerEvent(QTimerEvent *e)
 {
-    if(action & GO_LEFT == GO_LEFT) {
+    if(direction<0) {
         PulseLeft();
     }
-    if(action & GO_FORWARD == GO_FORWARD) {
+    if(forward==true) {
         PulseForward();
     }
-    if(action & GO_RIGHT == GO_RIGHT) {
+    if(direction>0) {
         PulseRight();
     }
-    if(action == STOP) {
+    if(direction==0 && forward==false) {
         this->stop();
     }
 }

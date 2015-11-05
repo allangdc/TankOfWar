@@ -10,6 +10,8 @@ class GameViewer: public QGraphicsView
 public:
     GameViewer(bool fullscreen=false);
     void show();
+protected:
+
 private:
     SceneGame *sc_game;
     QRect geometry;

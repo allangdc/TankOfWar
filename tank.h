@@ -32,7 +32,8 @@ protected:
     void PulseRight();
     void PulseForward();
 private:
-    unsigned char action;
+    int direction;
+    bool forward;
 };
 
 #endif // TANK_H

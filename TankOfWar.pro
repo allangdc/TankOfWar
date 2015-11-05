@@ -17,14 +17,18 @@ SOURCES += main.cpp \
     gameviewer.cpp \
     scenegame.cpp \
     tankcontrolbutton.cpp \
-    tankcontrolleft.cpp
+    tankcontrolleft.cpp \
+    tankcontrolright.cpp \
+    tankcontrolforward.cpp
 
 HEADERS  += \
     tank.h \
     gameviewer.h \
     scenegame.h \
     tankcontrolbutton.h \
-    tankcontrolleft.h
+    tankcontrolleft.h \
+    tankcontrolright.h \
+    tankcontrolforward.h
 
 FORMS    +=
 
