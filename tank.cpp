@@ -1,20 +1,22 @@
 #include "tank.h"
+#include "bomb.h"
 
 #include <QtMath>
 #include <QObject>
 #include <QGraphicsScene>
 #include <QDebug>
 
-Tank::Tank() : QGraphicsPixmapItem()
+Tank::Tank(QGraphicsScene *scene) : QGraphicsPixmapItem(), QTimer()
 {
-    setPixmap(QPixmap(":/image/tank/image/yellow.png").scaled(QSize(80,80),
-                                                              Qt::IgnoreAspectRatio,
-                                                              Qt::SmoothTransformation));  //imagem do tanque;
+    setPixmap(QPixmap(TANK_IMAGE).scaled(QSize(80,80),
+                                         Qt::IgnoreAspectRatio,
+                                         Qt::SmoothTransformation));  //imagem do tanque;
     setTransformOriginPoint(this->pixmap().width()/2, this->pixmap().height()/2);   //define o ponto de rotação
     setRotation(0);
     setInterval(100);
     direction=0;
     forward = false;
+    this->scene = scene;
 }
 
 void Tank::RotateLeft(bool run)
@@ -59,6 +61,15 @@ void Tank::SetOrientation(int x, int y, double angle)
     QPointF pt(x, y);
     setPos(pt);
     setRotation(angle);
+}
+
+void Tank::Fire()
+{
+    QPointF pt;
+    pt.setY(this->y());
+    pt.setX(this->x() + this->pixmap().width()/2);
+    Bomb *bomb = new Bomb(scene, pt, this->rotation());
+    bomb->Fire();
 }
 
 void Tank::timerEvent(QTimerEvent *e)

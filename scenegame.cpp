@@ -17,11 +17,11 @@ SceneGame::SceneGame() : QGraphicsScene()
 
 void SceneGame::LoadObjects()
 {
-    Tank *t1 = new Tank();
+    Tank *t1 = new Tank(this);
     addItem(t1);
     tanks.push_back(t1);
 
-    Tank *t2 = new Tank();
+    Tank *t2 = new Tank(this);
     addItem(t2);
     tanks.push_back(t2);
 
@@ -75,6 +75,9 @@ void SceneGame::keyReleaseEvent(QKeyEvent *event)
         tank_buttons.at(1)->Click(false);
     if(event->key() == Qt::Key_Up)
         tank_buttons.at(2)->Click(false);
+    if(event->key() == Qt::Key_Space)
+        tanks.at(0)->Fire();
+
 }
 
 void SceneGame::WantClose()

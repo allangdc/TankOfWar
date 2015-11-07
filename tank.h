@@ -4,7 +4,8 @@
 #include <QGraphicsPixmapItem>
 #include <QTimer>
 
-#define STEP    10.0
+#define STEP        10.0
+#define TANK_IMAGE  ":/image/tank/image/yellow.png"
 
 enum {
     STOP        = 0b00000000,   // 0
@@ -14,10 +15,12 @@ enum {
     GO_STOP     = 0b10000000    //
 };
 
+class QGraphicsScene;
+
 class Tank: public QGraphicsPixmapItem, public QTimer
 {
 public:
-    Tank();
+    Tank(QGraphicsScene *scene);
     void RotateLeft(bool run=true);
     void RotateRight(bool run=true);
     void MoveFoward(bool run=true);
@@ -26,6 +29,7 @@ public:
     void SetOrientation(int x, int y, double angle);
     int Action();
     void MoveAction(int action);
+    void Fire();
 protected:
     void timerEvent(QTimerEvent *e);
     void PulseLeft();
@@ -34,6 +38,7 @@ protected:
 private:
     int direction;
     bool forward;
+    QGraphicsScene *scene;
 };
 
 #endif // TANK_H
