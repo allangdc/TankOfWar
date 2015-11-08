@@ -20,7 +20,8 @@ SOURCES += main.cpp \
     tankcontrolleft.cpp \
     tankcontrolright.cpp \
     tankcontrolforward.cpp \
-    bomb.cpp
+    bomb.cpp \
+    tankcontrolfire.cpp
 
 HEADERS  += \
     tank.h \
@@ -30,7 +31,8 @@ HEADERS  += \
     tankcontrolleft.h \
     tankcontrolright.h \
     tankcontrolforward.h \
-    bomb.h
+    bomb.h \
+    tankcontrolfire.h
 
 FORMS    +=
 

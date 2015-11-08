@@ -65,10 +65,17 @@ void Tank::SetOrientation(int x, int y, double angle)
 
 void Tank::Fire()
 {
-    QPointF pt;
-    pt.setY(this->y());
-    pt.setX(this->x() + this->pixmap().width()/2);
-    Bomb *bomb = new Bomb(scene, pt, this->rotation());
+    Bomb *bomb = new Bomb(scene);
+    QPointF pt;     //position of the bomb
+    QPointF ori;    //center of the rotation
+    pt.setY(this->y() - bomb->pixmap().height()/2);
+    pt.setX(this->x() + this->pixmap().width()/2 - bomb->pixmap().width()/2);
+    ori.setX(bomb->pixmap().width()/2);
+    ori.setY(this->transformOriginPoint().y() + bomb->pixmap().height()/2);
+
+    bomb->setPos(pt);
+    bomb->setTransformOriginPoint(ori);
+    bomb->SetAngle(this->rotation());
     bomb->Fire();
 }
 

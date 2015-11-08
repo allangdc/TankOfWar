@@ -5,7 +5,7 @@
 
 Bomb::Bomb(QGraphicsScene *scene): QGraphicsPixmapItem(), QTimer()
 {
-    setPixmap(QPixmap(BOMB_IMAGE).scaled(QSize(30,30),
+    setPixmap(QPixmap(BOMB_IMAGE).scaled(QSize(20,20),
                                          Qt::IgnoreAspectRatio,
                                          Qt::SmoothTransformation));
     setTransformOriginPoint(this->pixmap().width()/2, this->pixmap().height()/2);   //define o ponto de rotação

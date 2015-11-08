@@ -6,10 +6,10 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 
-#include "tankcontrolbutton.h"
 #include "tankcontrolleft.h"
 #include "tankcontrolright.h"
 #include "tankcontrolforward.h"
+#include "tankcontrolfire.h"
 
 SceneGame::SceneGame() : QGraphicsScene()
 {
@@ -44,6 +44,11 @@ void SceneGame::LoadObjects()
     bforward->setPos(this->width()/2 - bforward->Size().width()/2, this->height()-bforward->Size().height()-space);
     addItem(bforward);
     tank_buttons.push_back(bforward);
+
+    TankControlFire *bfire = new TankControlFire(t1);
+    bfire->setPos(this->width() - bfire->Size().width() - space, this->height()-2.5*bfire->Size().height()-space);
+    addItem(bfire);
+    tank_buttons.push_back(bfire);
 }
 
 void SceneGame::keyPressEvent(QKeyEvent *event)
@@ -61,6 +66,8 @@ void SceneGame::keyPressEvent(QKeyEvent *event)
         tank_buttons.at(1)->Click(true);
     if(event->key() == Qt::Key_Up)
         tank_buttons.at(2)->Click(true);
+    if(event->key() == Qt::Key_Space)
+        tank_buttons.at(3)->Click(true);
 }
 
 void SceneGame::keyReleaseEvent(QKeyEvent *event)
@@ -76,7 +83,7 @@ void SceneGame::keyReleaseEvent(QKeyEvent *event)
     if(event->key() == Qt::Key_Up)
         tank_buttons.at(2)->Click(false);
     if(event->key() == Qt::Key_Space)
-        tanks.at(0)->Fire();
+        tank_buttons.at(3)->Click(false);
 
 }
 
