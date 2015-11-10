@@ -4,7 +4,7 @@
 
 TankControlButton::TankControlButton(Tank *tank) : QGraphicsPixmapItem()
 {
-    size = QSizeF(100,100);
+    size = QSizeF(120,120);
     this->tank = tank;
     this->setTransformOriginPoint(size.width()/2, size.height()/2);
     this->setAcceptTouchEvents(true);
@@ -64,6 +64,21 @@ void TankControlButton::mouseReleaseEvent(QGraphicsSceneMouseEvent *e)
 #endif
 
 #ifdef __ANDROID__
+bool TankControlButton::sceneEvent(QEvent *event) {
+    switch (event->type()) {
+        case QEvent::TouchBegin:
+            Click(true);
+        break;
+        case QEvent::TouchUpdate:
+        break;
+        case QEvent::TouchEnd:
+            Click(false);
+        break;
+    }
+    return true;
+}
+
+/*
 bool TankControlButton::sceneEvent(QEvent *event)
 {
     switch (event->type()) {
@@ -109,4 +124,5 @@ bool TankControlButton::sceneEvent(QEvent *event)
     }
     return true;
 }
+*/
 #endif

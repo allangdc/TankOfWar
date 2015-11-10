@@ -1,5 +1,6 @@
 #include "tank.h"
 #include "bomb.h"
+#include "progressbar.h"
 
 #include <QtMath>
 #include <QObject>
@@ -12,17 +13,31 @@ Tank::Tank(QGraphicsScene *scene) : QGraphicsPixmapItem(), QTimer()
                                          Qt::IgnoreAspectRatio,
                                          Qt::SmoothTransformation));  //imagem do tanque;
     setTransformOriginPoint(this->pixmap().width()/2, this->pixmap().height()/2);   //define o ponto de rotação
-    setRotation(0);
     setInterval(100);
     direction=0;
     forward = false;
     this->scene = scene;
+    progress = new ProgressBar(QSize(this->pixmap().width(), this->pixmap().width()/8), this);
+    progress->setTransformOriginPoint(progress->pixmap().width()/2,
+                                      -(this->pixmap().height() + 10 + progress->pixmap().height()/2)/2);
+    progress->setPos(this->x(), this->y());
+    scene->addItem(progress);
+    setRotation(0);
+    life = 100;
+}
+
+Tank::~Tank()
+{
+    delete progress;
 }
 
 void Tank::RotateLeft(bool run)
 {
-    if(run)
+    if(run) {
+        if(direction!=-1)
+            PulseLeft();
         direction = -1;
+    }
     else if(direction<0) {
         direction = 0;
     }
@@ -31,8 +46,11 @@ void Tank::RotateLeft(bool run)
 
 void Tank::RotateRight(bool run)
 {
-    if(run)
+    if(run) {
+        if(direction!=1)
+            PulseRight();
         direction = 1;
+    }
     else if(direction>0) {
         direction = 0;
     }
@@ -41,6 +59,8 @@ void Tank::RotateRight(bool run)
 
 void Tank::MoveFoward(bool run)
 {
+    if(forward != run)
+        PulseForward();
     forward = run;
     this->start();
 }
@@ -77,6 +97,26 @@ void Tank::Fire()
     bomb->setTransformOriginPoint(ori);
     bomb->SetAngle(this->rotation());
     bomb->Fire();
+
+    life-=10;
+    progress->SetProgress((qreal) life/ 100.0);
+}
+
+void Tank::setPos(qreal x, qreal y)
+{
+    setPos(QPoint(x, y));
+}
+
+void Tank::setPos(QPointF point)
+{
+    QGraphicsPixmapItem::setPos(point);
+    progress->setPos(point.x(), point.y() + pixmap().height() + 10);
+}
+
+void Tank::setRotation(qreal angle)
+{
+    QGraphicsPixmapItem::setRotation(angle);
+    progress->setRotation(angle);
 }
 
 void Tank::timerEvent(QTimerEvent *e)

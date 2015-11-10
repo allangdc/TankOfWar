@@ -3,6 +3,7 @@
 
 #include <QGraphicsScene>
 #include <QVector>
+#include <QEvent>
 #include "tank.h"
 #include "tankcontrolbutton.h"
 

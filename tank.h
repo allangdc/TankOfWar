@@ -16,11 +16,13 @@ enum {
 };
 
 class QGraphicsScene;
+class ProgressBar;
 
 class Tank: public QGraphicsPixmapItem, public QTimer
 {
 public:
     Tank(QGraphicsScene *scene);
+    virtual ~Tank();
     void RotateLeft(bool run=true);
     void RotateRight(bool run=true);
     void MoveFoward(bool run=true);
@@ -30,6 +32,9 @@ public:
     int Action();
     void MoveAction(int action);
     void Fire();
+    void setPos(qreal x, qreal y);
+    void setPos(QPointF point);
+    void setRotation(qreal angle);
 protected:
     void timerEvent(QTimerEvent *e);
     void PulseLeft();
@@ -39,6 +44,8 @@ private:
     int direction;
     bool forward;
     QGraphicsScene *scene;
+    ProgressBar *progress;
+    int life;
 };
 
 #endif // TANK_H

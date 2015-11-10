@@ -5,7 +5,9 @@
 #include <QApplication>
 #include <QKeyEvent>
 #include <QMessageBox>
+#include <iostream>
 
+#include "progressbar.h"
 #include "tankcontrolleft.h"
 #include "tankcontrolright.h"
 #include "tankcontrolforward.h"
@@ -46,7 +48,7 @@ void SceneGame::LoadObjects()
     tank_buttons.push_back(bforward);
 
     TankControlFire *bfire = new TankControlFire(t1);
-    bfire->setPos(this->width() - bfire->Size().width() - space, this->height()-2.5*bfire->Size().height()-space);
+    bfire->setPos(this->width() - bfire->Size().width() - space, this->height()-2.2*bfire->Size().height()-space);
     addItem(bfire);
     tank_buttons.push_back(bfire);
 }
