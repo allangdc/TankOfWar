@@ -3,9 +3,15 @@
 
 #include <QGraphicsPixmapItem>
 #include <QTimer>
+#include <QSound>
 
-#define STEP        10.0
-#define TANK_IMAGE  ":/image/tank/image/yellow.png"
+#define VELOCITY_TANK       100.0f //pixel/sec
+#define FRAME_TANK          60
+#define STEP_TANK           VELOCITY_TANK/FRAME_TANK
+
+#define TANK_IMAGE          ":/image/tank/image/yellow.png"
+#define FIRE_SOUND          ":/Sounds/Fire/sounds/TankFire01.wav"
+#define DRIVE_TANK_SOUND    ":/Sounds/Fire/sounds/TankMove01.wav"
 
 enum {
     STOP        = 0b00000000,   // 0
@@ -46,6 +52,8 @@ private:
     QGraphicsScene *scene;
     ProgressBar *progress;
     int life;
+    QSound *sound_fire;
+    QSound *sound_drive;
 };
 
 #endif // TANK_H

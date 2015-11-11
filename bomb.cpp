@@ -9,7 +9,7 @@ Bomb::Bomb(QGraphicsScene *scene): QGraphicsPixmapItem(), QTimer()
                                          Qt::IgnoreAspectRatio,
                                          Qt::SmoothTransformation));
     setTransformOriginPoint(this->pixmap().width()/2, this->pixmap().height()/2);   //define o ponto de rotação
-    setInterval(50);
+    setInterval(1000.0f/FRAME_BOMB);
     this->scene = scene;
 }
 
@@ -45,8 +45,8 @@ void Bomb::PulseForward()
 {
     QPointF pt = this->pos();
     qreal radian = qDegreesToRadians(rotation());
-    pt.setX(pt.x() + STEP * qSin(radian));
-    pt.setY(pt.y() - STEP * qCos(radian));
+    pt.setX(pt.x() + STEP_BOMB * qSin(radian));
+    pt.setY(pt.y() - STEP_BOMB * qCos(radian));
     setPos(pt);
 }
 

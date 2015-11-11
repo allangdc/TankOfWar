@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QGraphicsScene>
 #include <QDebug>
+#include <QSound>
 
 Tank::Tank(QGraphicsScene *scene) : QGraphicsPixmapItem(), QTimer()
 {
@@ -13,7 +14,7 @@ Tank::Tank(QGraphicsScene *scene) : QGraphicsPixmapItem(), QTimer()
                                          Qt::IgnoreAspectRatio,
                                          Qt::SmoothTransformation));  //imagem do tanque;
     setTransformOriginPoint(this->pixmap().width()/2, this->pixmap().height()/2);   //define o ponto de rotação
-    setInterval(100);
+    setInterval(1000.0f / qreal(FRAME_TANK));
     direction=0;
     forward = false;
     this->scene = scene;
@@ -24,6 +25,9 @@ Tank::Tank(QGraphicsScene *scene) : QGraphicsPixmapItem(), QTimer()
     scene->addItem(progress);
     setRotation(0);
     life = 100;
+
+    sound_fire = new QSound(FIRE_SOUND);
+    sound_drive = new QSound(DRIVE_TANK_SOUND);
 }
 
 Tank::~Tank()
@@ -85,6 +89,7 @@ void Tank::SetOrientation(int x, int y, double angle)
 
 void Tank::Fire()
 {
+    sound_fire->play();
     Bomb *bomb = new Bomb(scene);
     QPointF pt;     //position of the bomb
     QPointF ori;    //center of the rotation
@@ -121,35 +126,36 @@ void Tank::setRotation(qreal angle)
 
 void Tank::timerEvent(QTimerEvent *e)
 {
-    if(direction<0) {
-        PulseLeft();
-    }
-    if(forward==true) {
-        PulseForward();
-    }
-    if(direction>0) {
-        PulseRight();
-    }
     if(direction==0 && forward==false) {
         this->stop();
+    } else {
+        if(direction<0) {
+            PulseLeft();
+        }
+        if(forward==true) {
+            PulseForward();
+        }
+        if(direction>0) {
+            PulseRight();
+        }
     }
 }
 
 void Tank::PulseLeft()
 {
-    setRotation(rotation() - STEP);
+    setRotation(rotation() - STEP_TANK);
 }
 
 void Tank::PulseRight()
 {
-    setRotation(rotation() + STEP);
+    setRotation(rotation() + STEP_TANK);
 }
 
 void Tank::PulseForward()
 {
     QPointF pt = this->pos();
     double radian = qDegreesToRadians(rotation());
-    pt.setX(pt.x() + STEP * qSin(radian));
-    pt.setY(pt.y() - STEP * qCos(radian));
+    pt.setX(pt.x() + STEP_TANK * qSin(radian));
+    pt.setY(pt.y() - STEP_TANK * qCos(radian));
     setPos(pt);
 }

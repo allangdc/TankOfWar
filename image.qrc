@@ -11,4 +11,7 @@
     <qresource prefix="/Image/bombs">
         <file>image/ball01.png</file>
     </qresource>
+    <qresource prefix="/Sounds/Fire">
+        <file>sounds/TankFire01.wav</file>
+    </qresource>
 </RCC>
