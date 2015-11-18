@@ -1,12 +1,13 @@
 #include "tank.h"
 #include "bomb.h"
 #include "progressbar.h"
+#include "sound.h"
 
 #include <QtMath>
 #include <QObject>
 #include <QGraphicsScene>
 #include <QDebug>
-#include <QSound>
+#include <QTimerEvent>
 
 Tank::Tank(QGraphicsScene *scene) : QGraphicsPixmapItem(), QTimer()
 {
@@ -26,12 +27,16 @@ Tank::Tank(QGraphicsScene *scene) : QGraphicsPixmapItem(), QTimer()
     setRotation(0);
     life = 100;
 
-    sound_fire = new QSound(FIRE_SOUND);
-    sound_drive = new QSound(DRIVE_TANK_SOUND);
+    sound_fire = new Sound(FIRE_SOUND);
+    sound_drive = new Sound(DRIVE_TANK_SOUND);
+
+    id = qrand() * 100000;
 }
 
 Tank::~Tank()
 {
+    delete sound_fire;
+    delete sound_drive;
     delete progress;
 }
 
@@ -89,8 +94,10 @@ void Tank::SetOrientation(int x, int y, double angle)
 
 void Tank::Fire()
 {
-    sound_fire->play();
+    sound_fire->Play(FIRE_SOUND, false);
+
     Bomb *bomb = new Bomb(scene);
+    bomb->SetID(this->id);
     QPointF pt;     //position of the bomb
     QPointF ori;    //center of the rotation
     pt.setY(this->y() - bomb->pixmap().height()/2);
@@ -127,6 +134,8 @@ void Tank::setRotation(qreal angle)
 void Tank::timerEvent(QTimerEvent *e)
 {
     if(direction==0 && forward==false) {
+        if(sound_drive->IsPlaying())
+            sound_drive->Stop();
         this->stop();
     } else {
         if(direction<0) {
@@ -138,6 +147,8 @@ void Tank::timerEvent(QTimerEvent *e)
         if(direction>0) {
             PulseRight();
         }
+        if(!sound_drive->IsPlaying())
+            sound_drive->Play(true);
     }
 }
 

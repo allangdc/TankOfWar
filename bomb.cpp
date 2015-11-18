@@ -36,6 +36,16 @@ void Bomb::SetAngle(qreal angle)
     setRotation(angle);
 }
 
+void Bomb::SetID(int value)
+{
+    id = value;
+}
+
+int Bomb::ID()
+{
+    return id;
+}
+
 void Bomb::timerEvent(QTimerEvent *e)
 {
     PulseForward();

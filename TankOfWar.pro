@@ -22,7 +22,8 @@ SOURCES += main.cpp \
     tankcontrolforward.cpp \
     bomb.cpp \
     tankcontrolfire.cpp \
-    progressbar.cpp
+    progressbar.cpp \
+    sound.cpp
 
 HEADERS  += \
     tank.h \
@@ -34,7 +35,8 @@ HEADERS  += \
     tankcontrolforward.h \
     bomb.h \
     tankcontrolfire.h \
-    progressbar.h
+    progressbar.h \
+    sound.h
 
 FORMS    +=
 

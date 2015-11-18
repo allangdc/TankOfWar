@@ -3,7 +3,6 @@
 
 #include <QGraphicsPixmapItem>
 #include <QTimer>
-#include <QSound>
 
 #define VELOCITY_TANK       100.0f //pixel/sec
 #define FRAME_TANK          60
@@ -11,7 +10,7 @@
 
 #define TANK_IMAGE          ":/image/tank/image/yellow.png"
 #define FIRE_SOUND          ":/Sounds/Fire/sounds/TankFire01.wav"
-#define DRIVE_TANK_SOUND    ":/Sounds/Fire/sounds/TankMove01.wav"
+#define DRIVE_TANK_SOUND    ":/Sounds/Fire/sounds/TankMove02.wav"
 
 enum {
     STOP        = 0b00000000,   // 0
@@ -23,6 +22,7 @@ enum {
 
 class QGraphicsScene;
 class ProgressBar;
+class Sound;
 
 class Tank: public QGraphicsPixmapItem, public QTimer
 {
@@ -47,13 +47,14 @@ protected:
     void PulseRight();
     void PulseForward();
 private:
+    int id;
     int direction;
     bool forward;
     QGraphicsScene *scene;
     ProgressBar *progress;
     int life;
-    QSound *sound_fire;
-    QSound *sound_drive;
+    Sound *sound_fire;
+    Sound *sound_drive;
 };
 
 #endif // TANK_H

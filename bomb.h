@@ -19,10 +19,13 @@ public:
     Bomb(QGraphicsScene *scene, QPointF position, qreal angle);
     void Fire();
     void SetAngle(qreal angle);
+    void SetID(int value);
+    int ID();
 private:
     void timerEvent(QTimerEvent *e);
     void PulseForward();
     QGraphicsScene *scene;
+    int id;
 };
 
 #endif // BOMB_H

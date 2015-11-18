@@ -13,5 +13,6 @@
     </qresource>
     <qresource prefix="/Sounds/Fire">
         <file>sounds/TankFire01.wav</file>
+        <file>sounds/TankMove02.wav</file>
     </qresource>
 </RCC>
