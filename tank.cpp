@@ -4,6 +4,7 @@
 #include "sound.h"
 
 #include <QtMath>
+#include <QTime>
 #include <QObject>
 #include <QGraphicsScene>
 #include <QDebug>
@@ -30,7 +31,9 @@ Tank::Tank(QGraphicsScene *scene) : QGraphicsPixmapItem(), QTimer()
     sound_fire = new Sound(FIRE_SOUND);
     sound_drive = new Sound(DRIVE_TANK_SOUND);
 
-    id = qrand() * 100000;
+    QTime now = QTime::currentTime();
+    qsrand(now.msec());
+    id = qrand() % 100000;
 }
 
 Tank::~Tank()
@@ -110,8 +113,8 @@ void Tank::Fire()
     bomb->SetAngle(this->rotation());
     bomb->Fire();
 
-    life-=10;
-    progress->SetProgress((qreal) life/ 100.0);
+    //life-=10;
+    //progress->SetProgress((qreal) life/ 100.0);
 }
 
 void Tank::setPos(qreal x, qreal y)
@@ -129,6 +132,17 @@ void Tank::setRotation(qreal angle)
 {
     QGraphicsPixmapItem::setRotation(angle);
     progress->setRotation(angle);
+}
+
+void Tank::HitByBomb(Bomb *bomb)
+{
+    if(bomb) {
+        if(bomb->ID() != this->id) {
+            life-=10;
+            progress->SetProgress((qreal) life/ 100.0);
+            delete bomb;
+        }
+    }
 }
 
 void Tank::timerEvent(QTimerEvent *e)

@@ -23,6 +23,7 @@ enum {
 class QGraphicsScene;
 class ProgressBar;
 class Sound;
+class Bomb;
 
 class Tank: public QGraphicsPixmapItem, public QTimer
 {
@@ -41,6 +42,7 @@ public:
     void setPos(qreal x, qreal y);
     void setPos(QPointF point);
     void setRotation(qreal angle);
+    void HitByBomb(Bomb *bomb);
 protected:
     void timerEvent(QTimerEvent *e);
     void PulseLeft();

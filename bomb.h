@@ -8,7 +8,8 @@
 #define VELOCITY_BOMB   300.0f //pixel/sec
 #define FRAME_BOMB      60.0f
 #define STEP_BOMB       VELOCITY_BOMB/FRAME_BOMB
-#define BOMB_IMAGE  ":/Image/bombs/image/ball01.png"
+#define BOMB_IMAGE      ":/Image/bombs/image/ball01.png"
+#define MAX_STEPS       1000
 
 class QGraphicsScene;
 
@@ -26,6 +27,7 @@ private:
     void PulseForward();
     QGraphicsScene *scene;
     int id;
+    int steps;
 };
 
 #endif // BOMB_H
