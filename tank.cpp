@@ -30,16 +30,19 @@ Tank::Tank(QGraphicsScene *scene) : QGraphicsPixmapItem(), QTimer()
 
     sound_fire = new Sound(FIRE_SOUND);
     sound_drive = new Sound(DRIVE_TANK_SOUND);
+    sound_explosion = new Sound(EXPLOSION_SOUND);
 
     QTime now = QTime::currentTime();
+    while(now == QTime::currentTime());
     qsrand(now.msec());
-    id = qrand() % 100000;
+    id = qrand();
 }
 
 Tank::~Tank()
 {
     delete sound_fire;
     delete sound_drive;
+    delete sound_explosion;
     delete progress;
 }
 
@@ -112,9 +115,6 @@ void Tank::Fire()
     bomb->setTransformOriginPoint(ori);
     bomb->SetAngle(this->rotation());
     bomb->Fire();
-
-    //life-=10;
-    //progress->SetProgress((qreal) life/ 100.0);
 }
 
 void Tank::setPos(qreal x, qreal y)
@@ -141,8 +141,19 @@ void Tank::HitByBomb(Bomb *bomb)
             life-=10;
             progress->SetProgress((qreal) life/ 100.0);
             delete bomb;
+            if(life <= 0)
+                Died();
         }
     }
+}
+
+void Tank::Died()
+{
+    sound_explosion->Play(false);
+    setPixmap(QPixmap(TANK_DEAD_IMAGE).scaled(QSize(80,80),
+                                         Qt::IgnoreAspectRatio,
+                                         Qt::SmoothTransformation));  //imagem do tanque;
+    setTransformOriginPoint(this->pixmap().width()/2, this->pixmap().height()/2);   //define o ponto de rotação
 }
 
 void Tank::timerEvent(QTimerEvent *e)

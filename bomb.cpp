@@ -5,7 +5,6 @@
 #include <QGraphicsScene>
 #include <QList>
 
-
 Bomb::Bomb(QGraphicsScene *scene): QGraphicsPixmapItem(), QTimer()
 {
     setPixmap(QPixmap(BOMB_IMAGE).scaled(QSize(20,20),

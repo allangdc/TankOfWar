@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/image/tank">
         <file>image/yellow.png</file>
+        <file>image/red.png</file>
     </qresource>
     <qresource prefix="/image/buttons">
         <file>image/arrow_blue.png</file>
@@ -14,5 +15,6 @@
     <qresource prefix="/Sounds/Fire">
         <file>sounds/TankFire01.wav</file>
         <file>sounds/TankMove02.wav</file>
+        <file>sounds/Explosion01.wav</file>
     </qresource>
 </RCC>

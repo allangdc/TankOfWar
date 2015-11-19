@@ -51,6 +51,14 @@ void SceneGame::LoadObjects()
     bfire->setPos(this->width() - bfire->Size().width() - space, this->height()-2.2*bfire->Size().height()-space);
     addItem(bfire);
     tank_buttons.push_back(bfire);
+
+#ifndef __ANDROID__
+    for(QVector<TankControlButton *>::iterator it=tank_buttons.begin(); it != tank_buttons.end(); it++)
+    {
+        TankControlButton *tc = *it;
+        tc->setVisible(false);
+    }
+#endif
 }
 
 void SceneGame::keyPressEvent(QKeyEvent *event)
