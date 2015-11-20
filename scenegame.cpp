@@ -5,7 +5,8 @@
 #include <QApplication>
 #include <QKeyEvent>
 #include <QMessageBox>
-#include <iostream>
+#include <QGraphicsView>
+#include <QDesktopWidget>
 
 #include "progressbar.h"
 #include "tankcontrolleft.h"
@@ -13,12 +14,24 @@
 #include "tankcontrolforward.h"
 #include "tankcontrolfire.h"
 
-SceneGame::SceneGame() : QGraphicsScene()
+SceneGame::SceneGame(QGraphicsView *view) : QGraphicsScene()
 {
+    this->view = view;
 }
 
 void SceneGame::LoadObjects()
-{
+{   
+    float scale = view->width() / this->width();
+    this->view->scale(scale, scale);
+
+    QGraphicsTextItem *txt = new QGraphicsTextItem("AAA");
+    this->addItem(txt);
+
+    QGraphicsRectItem *rect = new QGraphicsRectItem(QRect(0,0,800,800));
+    this->addItem(rect);
+    QGraphicsLineItem *line = new QGraphicsLineItem(400,0, 400, 800);
+    this->addItem(line);
+
     Tank *t1 = new Tank(this);
     addItem(t1);
     tanks.push_back(t1);
@@ -30,35 +43,46 @@ void SceneGame::LoadObjects()
     t2->SetOrientation(50,50, 180);
     t1->SetOrientation(250,250, 0);
 
-    const int space = 30;
+    const float space = 20.0;
+    QPointF ptf;
 
     TankControlLeft *bleft = new TankControlLeft(t1);
-    bleft->setPos(space, this->height()-bleft->Size().height()-space);
+    ptf = QPointF(space/scale,
+                  view->height()-bleft->Size().height()*scale-space/scale);
+    bleft->setPos(view->mapToScene(ptf.toPoint()));
     addItem(bleft);
     tank_buttons.push_back(bleft);
 
     TankControlRight *bright = new TankControlRight(t1);
-    bright->setPos(this->width() - bright->Size().width() - space, this->height()-bright->Size().height()-space);
+    ptf = QPointF(view->width() - bright->Size().width()*scale - space/scale,
+                  view->height()-bright->Size().height()*scale-space/scale);
+    bright->setPos(view->mapToScene(ptf.toPoint()));
     addItem(bright);
     tank_buttons.push_back(bright);
 
     TankControlForward *bforward = new TankControlForward(t1);
-    bforward->setPos(this->width()/2 - bforward->Size().width()/2, this->height()-bforward->Size().height()-space);
+    ptf = QPointF(view->width()/2 - bforward->Size().width()*scale/2,
+                  view->height() - bforward->Size().height()*scale - space/scale);
+    bforward->setPos(view->mapToScene(ptf.toPoint()));
     addItem(bforward);
     tank_buttons.push_back(bforward);
 
     TankControlFire *bfire = new TankControlFire(t1);
-    bfire->setPos(this->width() - bfire->Size().width() - space, this->height()-2.2*bfire->Size().height()-space);
+    ptf = QPointF(view->width() - bfire->Size().width()*scale - space/scale,
+                  view->height() - 2*scale*(bfire->Size().height()/scale + space/scale) );
+    bfire->setPos(view->mapToScene(ptf.toPoint()));
     addItem(bfire);
     tank_buttons.push_back(bfire);
 
-#ifndef __ANDROID__
     for(QVector<TankControlButton *>::iterator it=tank_buttons.begin(); it != tank_buttons.end(); it++)
     {
         TankControlButton *tc = *it;
+#ifdef __ANDROID__
+        tc->setScale(1/scale);
+#else
         tc->setVisible(false);
-    }
 #endif
+    }
 }
 
 void SceneGame::keyPressEvent(QKeyEvent *event)

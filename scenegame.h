@@ -14,7 +14,7 @@ class TankControlForward;
 class SceneGame: public QGraphicsScene
 {
 public:
-    SceneGame();
+    SceneGame(QGraphicsView *view = NULL);
     void MoveTank(unsigned char action);
     void LoadObjects();
 protected:
@@ -24,6 +24,7 @@ protected:
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void keyReleaseEvent(QKeyEvent *event);
     void WantClose();
+    QGraphicsView *view;
 };
 
 #endif // SCENEGAME_H

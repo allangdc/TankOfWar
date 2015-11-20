@@ -9,7 +9,7 @@
 GameViewer::GameViewer(bool fullscreen): QGraphicsView()
 {
     this->fullscreen = fullscreen;
-    sc_game = new SceneGame();
+    sc_game = new SceneGame(this);
     this->setScene(sc_game);
     if(!fullscreen) {
         geometry = QRect(0,0,526,701);
@@ -17,8 +17,8 @@ GameViewer::GameViewer(bool fullscreen): QGraphicsView()
         geometry = QApplication::desktop()->screenGeometry();
     }
     setGeometry(geometry);
-    setSceneRect(geometry);
-    sc_game->setSceneRect(geometry);
+    setSceneRect(QRect(0,0, 800, 800));
+    sc_game->setSceneRect(QRect(0,0, 800, 800));
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     sc_game->LoadObjects();

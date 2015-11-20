@@ -10,6 +10,7 @@
 
 #define TANK_IMAGE          ":/image/tank/image/yellow.png"
 #define TANK_DEAD_IMAGE     ":/image/tank/image/red.png"
+
 #define FIRE_SOUND          ":/Sounds/Fire/sounds/TankFire01.wav"
 #define DRIVE_TANK_SOUND    ":/Sounds/Fire/sounds/TankMove02.wav"
 #define EXPLOSION_SOUND     ":/Sounds/Fire/sounds/Explosion01.wav"
