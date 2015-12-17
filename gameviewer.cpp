@@ -6,9 +6,12 @@
 #include <QTouchEvent>
 #include <QKeyEvent>
 
+#include <unistd.h>
+
 GameViewer::GameViewer(bool fullscreen): QGraphicsView()
 {
     this->fullscreen = fullscreen;
+
     sc_game = new SceneGame(this);
     this->setScene(sc_game);
     if(!fullscreen) {

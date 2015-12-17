@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <QVector>
 #include <QEvent>
+
 #include "tank.h"
 #include "tankcontrolbutton.h"
 
@@ -14,7 +15,7 @@ class TankControlForward;
 class SceneGame: public QGraphicsScene
 {
 public:
-    SceneGame(QGraphicsView *view = NULL);
+    explicit SceneGame(QGraphicsView *view = NULL);
     void MoveTank(unsigned char action);
     void LoadObjects();
 protected:

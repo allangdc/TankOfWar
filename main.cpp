@@ -1,6 +1,12 @@
 #include <QApplication>
 
 #include "gameviewer.h"
+#include "login.h"
+
+#include "game_server.h"
+#include "game_client.h"
+
+#include <QNetworkInterface>
 
 int main(int argc, char *argv[])
 {
@@ -11,7 +17,15 @@ int main(int argc, char *argv[])
 #else
     GameViewer game;
 #endif
-    game.show();
+
+    Login *login = new Login();
+    int ret = login->exec();
+    delete login;
+
+    if(ret == QDialog::Accepted)
+        game.show();
+    else
+        return 0;
 
 
     return a.exec();

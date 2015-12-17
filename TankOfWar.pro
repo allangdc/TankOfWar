@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui multimedia
+QT       += core gui multimedia network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -23,7 +23,11 @@ SOURCES += main.cpp \
     bomb.cpp \
     tankcontrolfire.cpp \
     progressbar.cpp \
-    sound.cpp
+    sound.cpp \
+    login.cpp \
+    game_client.cpp \
+    game_server.cpp \
+    game_socket.cpp
 
 HEADERS  += \
     tank.h \
@@ -36,9 +40,14 @@ HEADERS  += \
     bomb.h \
     tankcontrolfire.h \
     progressbar.h \
-    sound.h
+    sound.h \
+    login.h \
+    game_client.h \
+    game_server.h \
+    game_socket.h
 
-FORMS    +=
+FORMS    += \
+    login.ui
 
 CONFIG += mobility
 MOBILITY = 
