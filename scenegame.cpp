@@ -17,6 +17,23 @@
 SceneGame::SceneGame(QGraphicsView *view) : QGraphicsScene()
 {
     this->view = view;
+    gserver = NULL;
+    gclient = NULL;
+    InitServer();
+}
+
+SceneGame::~SceneGame()
+{
+    if(gserver)
+        delete gserver;
+    if(gclient)
+        delete gclient;
+}
+
+void SceneGame::InitServer()
+{
+    gserver = new GameServer();
+    //gclient = new GameClient();
 }
 
 void SceneGame::LoadObjects()

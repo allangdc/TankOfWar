@@ -28,8 +28,9 @@ class ProgressBar;
 class Sound;
 class Bomb;
 
-class Tank: public QGraphicsPixmapItem, public QTimer
+class Tank: public QTimer, public QGraphicsPixmapItem
 {
+    Q_OBJECT
 public:
     Tank(QGraphicsScene *scene);
     virtual ~Tank();
@@ -58,10 +59,15 @@ private:
     bool forward;
     QGraphicsScene *scene;
     ProgressBar *progress;
+    ProgressBar *progress_reload_weapon;
     int life;
+    int reload_weapon;
     Sound *sound_fire;
     Sound *sound_drive;
     Sound *sound_explosion;
+    QTimer *time_load_weapon;
+public slots:
+    void IncrementWeapon();
 };
 
 #endif // TANK_H

@@ -20,10 +20,19 @@ Tank::Tank(QGraphicsScene *scene) : QGraphicsPixmapItem(), QTimer()
     direction=0;
     forward = false;
     this->scene = scene;
+    // adjusting progress bars
     progress = new ProgressBar(QSize(this->pixmap().width(), this->pixmap().width()/8), this);
     progress->setTransformOriginPoint(progress->pixmap().width()/2,
                                       -(this->pixmap().height() + 10 + progress->pixmap().height()/2)/2);
     progress->setPos(this->x(), this->y());
+
+    progress_reload_weapon = new ProgressBar(QSize(this->pixmap().width(), this->pixmap().width()/8), this);
+    progress_reload_weapon->setTransformOriginPoint(progress_reload_weapon->pixmap().width()/2,
+                                                    -(this->pixmap().height() + 10 + progress_reload_weapon->pixmap().height()/2)/2);
+    progress_reload_weapon->setPos(this->x(), this->y() + this->pixmap().height()*1.3);
+    progress_reload_weapon->SetColors(qRgb(0,0,255), qRgb(255,0,255));
+
+
     scene->addItem(progress);
     setRotation(0);
     life = 100;
@@ -36,6 +45,13 @@ Tank::Tank(QGraphicsScene *scene) : QGraphicsPixmapItem(), QTimer()
     while(now == QTime::currentTime());
     qsrand(now.msec());
     id = qrand();
+
+    reload_weapon = 0;
+    progress_reload_weapon->SetProgress(0);
+    time_load_weapon = new QTimer();
+    time_load_weapon->setInterval(50);
+    connect(time_load_weapon, SIGNAL(timeout()), this, SLOT(IncrementWeapon()));
+    time_load_weapon->start();
 }
 
 Tank::~Tank()
@@ -44,6 +60,8 @@ Tank::~Tank()
     delete sound_drive;
     delete sound_explosion;
     delete progress;
+    delete progress_reload_weapon;
+    delete time_load_weapon;
 }
 
 void Tank::RotateLeft(bool run)
@@ -100,21 +118,28 @@ void Tank::SetOrientation(int x, int y, double angle)
 
 void Tank::Fire()
 {
-    sound_fire->Play(FIRE_SOUND, false);
+    if (reload_weapon >= 100) {
+        sound_fire->Play(FIRE_SOUND, false);
 
-    Bomb *bomb = new Bomb(scene);
-    bomb->SetID(this->id);
-    QPointF pt;     //position of the bomb
-    QPointF ori;    //center of the rotation
-    pt.setY(this->y() - bomb->pixmap().height()/2);
-    pt.setX(this->x() + this->pixmap().width()/2 - bomb->pixmap().width()/2);
-    ori.setX(bomb->pixmap().width()/2);
-    ori.setY(this->transformOriginPoint().y() + bomb->pixmap().height()/2);
+        Bomb *bomb = new Bomb(scene);
+        bomb->SetID(this->id);
+        QPointF pt;     //position of the bomb
+        QPointF ori;    //center of the rotation
+        pt.setY(this->y() - bomb->pixmap().height()/2);
+        pt.setX(this->x() + this->pixmap().width()/2 - bomb->pixmap().width()/2);
+        ori.setX(bomb->pixmap().width()/2);
+        ori.setY(this->transformOriginPoint().y() + bomb->pixmap().height()/2);
 
-    bomb->setPos(pt);
-    bomb->setTransformOriginPoint(ori);
-    bomb->SetAngle(this->rotation());
-    bomb->Fire();
+        bomb->setPos(pt);
+        bomb->setTransformOriginPoint(ori);
+        bomb->SetAngle(this->rotation());
+        bomb->Fire();
+        reload_weapon = 0;
+        progress_reload_weapon->SetProgress(0);
+        time_load_weapon->start();
+    } else {
+        reload_weapon = 0;
+    }
 }
 
 void Tank::setPos(qreal x, qreal y)
@@ -194,4 +219,13 @@ void Tank::PulseForward()
     pt.setX(pt.x() + STEP_TANK * qSin(radian));
     pt.setY(pt.y() - STEP_TANK * qCos(radian));
     setPos(pt);
+}
+
+void Tank::IncrementWeapon()
+{
+    reload_weapon++;
+    progress_reload_weapon->SetProgress(static_cast<qreal>(reload_weapon) / qreal(100.0));
+    if(reload_weapon>=100) {
+        time_load_weapon->stop();
+    }
 }
