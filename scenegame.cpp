@@ -38,7 +38,8 @@ void SceneGame::InitServer()
         gserver = new GameServer();
         connect(gserver, SIGNAL(InitConnection(int)), this, SLOT(ServerInitConnection(int)));
         connect(gserver, SIGNAL(ReceiverMSG(int,QByteArray)), SLOT(ServerReceiveMSG(int,QByteArray)));
-        CreateTank();
+        Tank *t = CreateTank();
+        CreateControls(t);
     } else {
         gclient = new GameClient();
         connect(gclient, SIGNAL(ReceiverMSG(QByteArray)), this, SLOT(ClientReceiveMSG(QByteArray)));
@@ -81,33 +82,39 @@ void SceneGame::LoadObjects()
 //    t2->SetOrientation(50,50, 180);
 //    t1->SetOrientation(250,250, 0);
 
-    Tank *t1 = CreateTank();
+//    Tank *t1 = CreateTank();
 
+//    CreateControls(t1);
+}
+
+void SceneGame::CreateControls(Tank *t)
+{
+    float scale = view->width() / this->width();
     const float space = 20.0;
     QPointF ptf;
 
-    TankControlLeft *bleft = new TankControlLeft(t1);
+    TankControlLeft *bleft = new TankControlLeft(t);
     ptf = QPointF(space/scale,
                   view->height()-bleft->Size().height()*scale-space/scale);
     bleft->setPos(view->mapToScene(ptf.toPoint()));
     addItem(bleft);
     tank_buttons.push_back(bleft);
 
-    TankControlRight *bright = new TankControlRight(t1);
+    TankControlRight *bright = new TankControlRight(t);
     ptf = QPointF(view->width() - bright->Size().width()*scale - space/scale,
                   view->height()-bright->Size().height()*scale-space/scale);
     bright->setPos(view->mapToScene(ptf.toPoint()));
     addItem(bright);
     tank_buttons.push_back(bright);
 
-    TankControlForward *bforward = new TankControlForward(t1);
+    TankControlForward *bforward = new TankControlForward(t);
     ptf = QPointF(view->width()/2 - bforward->Size().width()*scale/2,
                   view->height() - bforward->Size().height()*scale - space/scale);
     bforward->setPos(view->mapToScene(ptf.toPoint()));
     addItem(bforward);
     tank_buttons.push_back(bforward);
 
-    TankControlFire *bfire = new TankControlFire(t1);
+    TankControlFire *bfire = new TankControlFire(t);
     ptf = QPointF(view->width() - bfire->Size().width()*scale - space/scale,
                   view->height() - 2*scale*(bfire->Size().height()/scale + space/scale) );
     bfire->setPos(view->mapToScene(ptf.toPoint()));
@@ -123,11 +130,6 @@ void SceneGame::LoadObjects()
         tc->setVisible(false);
 #endif
     }
-}
-
-void SceneGame::CreateControls(Tank *t)
-{
-
 }
 
 void SceneGame::keyPressEvent(QKeyEvent *event)
