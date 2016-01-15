@@ -14,11 +14,13 @@
 class TankControlLeft;
 class TankControlRight;
 class TankControlForward;
+class GameViewer;
 
 class SceneGame: public QGraphicsScene
 {
+    Q_OBJECT
 public:
-    explicit SceneGame(QGraphicsView *view = NULL);
+    explicit SceneGame(GameViewer *view = NULL);
     ~SceneGame();
     void MoveTank(unsigned char action);
     void LoadObjects();
@@ -30,10 +32,18 @@ protected:
     virtual void keyPressEvent(QKeyEvent *event);
     virtual void keyReleaseEvent(QKeyEvent *event);
     void WantClose();
-    QGraphicsView *view;
+    GameViewer *view;
 
     GameServer *gserver;
     GameClient *gclient;
+
+public slots:
+    void ServerInitConnection(int id);
+    void ServerReceiveMSG(int id, QByteArray array);
+    void ClientReceiveMSG(QByteArray array);
+private:
+    Tank *CreateTank();
+    void CreateControls(Tank *t);
 };
 
 #endif // SCENEGAME_H

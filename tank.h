@@ -3,6 +3,7 @@
 
 #include <QGraphicsPixmapItem>
 #include <QTimer>
+#include <QPoint>
 
 #define VELOCITY_TANK       100.0f //pixel/sec
 #define FRAME_TANK          60
@@ -32,7 +33,8 @@ class Tank: public QTimer, public QGraphicsPixmapItem
 {
     Q_OBJECT
 public:
-    Tank(QGraphicsScene *scene);
+    explicit Tank(QGraphicsScene *scene);
+    Tank(QGraphicsScene *scene, QPointF position, qreal angle);
     virtual ~Tank();
     void RotateLeft(bool run=true);
     void RotateRight(bool run=true);
@@ -40,6 +42,7 @@ public:
     void MoveStop();
     void SetOrientation(QPoint position, double angle);
     void SetOrientation(int x, int y, double angle);
+    void SetOrientation();
     int Action();
     void MoveAction(int action);
     void Fire();

@@ -11,5 +11,6 @@ void GameClient::ReadyRead()
 {
     QByteArray data = this->readAll();
     qDebug() << "ALLAN: " << data;
+    emit ReceiverMSG(data);
 }
 

@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     GameViewer game;
 #endif
 
-    Login *login = new Login();
+    Login *login = new Login(&game);
     int ret = login->exec();
     delete login;
 

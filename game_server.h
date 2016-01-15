@@ -14,11 +14,13 @@ public:
     explicit GameServer(QObject *parent = 0);
     void ReadReady(int id, QByteArray data);
     void SendMessage(int id, QByteArray data);
+    void BroadcastMessage(QByteArray data);
 private:
     QVector<GameSocket *> sockets;
     QMutex mutex;
 signals:
-
+    void InitConnection(int id);
+    void ReceiverMSG(int id, QByteArray array);
 public slots:
     void NewConnection();
 };

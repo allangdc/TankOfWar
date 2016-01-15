@@ -19,7 +19,8 @@ void GameServer::ReadReady(int id, QByteArray data)
 {
     QMutexLocker lock(&mutex);
 
-    qDebug() << QString("socket[%1] =").arg(id) << data;
+    qDebug() << "SERVER->" << QString("socket[%1] =").arg(id) << data;
+    emit ReceiverMSG(id, data);
 }
 
 void GameServer::SendMessage(int id, QByteArray data)
@@ -38,6 +39,19 @@ void GameServer::SendMessage(int id, QByteArray data)
     }
 }
 
+void GameServer::BroadcastMessage(QByteArray data)
+{
+    for(QVector<GameSocket *>::iterator it = sockets.begin();
+                                        it != sockets.end();
+                                        it++) {
+        GameSocket *game_socket = *it;
+        QTcpSocket *socket = game_socket->getSocket();
+        socket->write(data);
+        socket->flush();
+        socket->waitForBytesWritten(3000);
+    }
+}
+
 
 void GameServer::NewConnection()
 {
@@ -52,5 +66,7 @@ void GameServer::NewConnection()
     socket->waitForBytesWritten(3000);
 
     sockets.push_back(game_socket);
+
+    emit InitConnection(game_socket->ID());
 }
 

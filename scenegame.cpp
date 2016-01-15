@@ -5,8 +5,11 @@
 #include <QApplication>
 #include <QKeyEvent>
 #include <QMessageBox>
-#include <QGraphicsView>
 #include <QDesktopWidget>
+
+#include "gameviewer.h"
+#include "game_socket.h"
+#include "protocol.h"
 
 #include "progressbar.h"
 #include "tankcontrolleft.h"
@@ -14,12 +17,11 @@
 #include "tankcontrolforward.h"
 #include "tankcontrolfire.h"
 
-SceneGame::SceneGame(QGraphicsView *view) : QGraphicsScene()
+SceneGame::SceneGame(GameViewer *view) : QGraphicsScene()
 {
     this->view = view;
     gserver = NULL;
     gclient = NULL;
-    InitServer();
 }
 
 SceneGame::~SceneGame()
@@ -32,8 +34,18 @@ SceneGame::~SceneGame()
 
 void SceneGame::InitServer()
 {
-    gserver = new GameServer();
-    //gclient = new GameClient();
+    if(view->IsServer()) {
+        gserver = new GameServer();
+        connect(gserver, SIGNAL(InitConnection(int)), this, SLOT(ServerInitConnection(int)));
+        connect(gserver, SIGNAL(ReceiverMSG(int,QByteArray)), SLOT(ServerReceiveMSG(int,QByteArray)));
+        CreateTank();
+    } else {
+        gclient = new GameClient();
+        connect(gclient, SIGNAL(ReceiverMSG(QByteArray)), this, SLOT(ClientReceiveMSG(QByteArray)));
+        gclient->connectToHost(view->IP(), 9999);
+        gclient->waitForConnected();
+        gclient->write("Conectei");
+    }
 }
 
 void SceneGame::LoadObjects()
@@ -41,24 +53,35 @@ void SceneGame::LoadObjects()
     float scale = view->width() / this->width();
     this->view->scale(scale, scale);
 
-    QGraphicsTextItem *txt = new QGraphicsTextItem("AAA");
-    this->addItem(txt);
+    QGraphicsTextItem *info = new QGraphicsTextItem();
+    QString msg = "Type: ";
+    if(view->IsServer())
+        msg += "Server";
+    else
+        msg += "Client";
+    msg += " | IP: ";
+    msg += view->IP();
+    info->setHtml(msg);
+    this->addItem(info);
+    info->setPos(0, -30);
 
     QGraphicsRectItem *rect = new QGraphicsRectItem(QRect(0,0,800,800));
     this->addItem(rect);
     QGraphicsLineItem *line = new QGraphicsLineItem(400,0, 400, 800);
     this->addItem(line);
 
-    Tank *t1 = new Tank(this);
-    addItem(t1);
-    tanks.push_back(t1);
+//    Tank *t1 = new Tank(this);
+//    addItem(t1);
+//    tanks.push_back(t1);
 
-    Tank *t2 = new Tank(this);
-    addItem(t2);
-    tanks.push_back(t2);
+//    Tank *t2 = new Tank(this);
+//    addItem(t2);
+//    tanks.push_back(t2);
 
-    t2->SetOrientation(50,50, 180);
-    t1->SetOrientation(250,250, 0);
+//    t2->SetOrientation(50,50, 180);
+//    t1->SetOrientation(250,250, 0);
+
+    Tank *t1 = CreateTank();
 
     const float space = 20.0;
     QPointF ptf;
@@ -100,6 +123,11 @@ void SceneGame::LoadObjects()
         tc->setVisible(false);
 #endif
     }
+}
+
+void SceneGame::CreateControls(Tank *t)
+{
+
 }
 
 void SceneGame::keyPressEvent(QKeyEvent *event)
@@ -146,5 +174,42 @@ void SceneGame::WantClose()
     if (reply == QMessageBox::Yes) {
       QApplication::quit();
     }
+}
+
+void SceneGame::ServerInitConnection(int id)
+{
+    Tank *t1 = CreateTank();
+    t1->SetOrientation();
+    QByteArray array = Protocol::CreateTank(t1->x(), t1->y(), t1->rotation());
+    gserver->BroadcastMessage(array);
+}
+
+void SceneGame::ServerReceiveMSG(int id, QByteArray array)
+{
+
+}
+
+void SceneGame::ClientReceiveMSG(QByteArray array)
+{
+    CCreateTank cct;
+    Tank *t;
+
+    switch (Protocol::GetCode(array)) {
+        case Protocol::CREATE_TANK:
+            cct = Protocol::GetCCreateTank(array);
+            t = new Tank(this, QPoint(cct.x, cct.y), cct.angle);
+        break;
+    }
+}
+
+Tank *SceneGame::CreateTank()
+{
+    Tank *t = new Tank(this);
+    addItem(t);
+    tanks.push_back(t);
+
+    t->SetOrientation();
+
+    return t;
 }
 

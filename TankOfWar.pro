@@ -27,7 +27,8 @@ SOURCES += main.cpp \
     login.cpp \
     game_client.cpp \
     game_server.cpp \
-    game_socket.cpp
+    game_socket.cpp \
+    protocol.cpp
 
 HEADERS  += \
     tank.h \
@@ -44,7 +45,8 @@ HEADERS  += \
     login.h \
     game_client.h \
     game_server.h \
-    game_socket.h
+    game_socket.h \
+    protocol.h
 
 FORMS    += \
     login.ui

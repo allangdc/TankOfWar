@@ -24,16 +24,34 @@ GameViewer::GameViewer(bool fullscreen): QGraphicsView()
     sc_game->setSceneRect(QRect(0,0, 800, 800));
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    sc_game->LoadObjects();
     this->setAttribute(Qt::WA_AcceptTouchEvents);
     viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
 }
 
 void GameViewer::show()
 {
+    sc_game->LoadObjects();
+    sc_game->InitServer();
+
     if(!fullscreen) {
         QGraphicsView::show();
     } else {
         QGraphicsView::showFullScreen();
     }
+}
+
+void GameViewer::setIP(bool is_server, QString ip_connect)
+{
+    this->is_server = is_server;
+    this->ipserver = ip_connect;
+}
+
+QString GameViewer::IP()
+{
+    return ipserver;
+}
+
+bool GameViewer::IsServer()
+{
+    return is_server;
 }

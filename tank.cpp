@@ -54,6 +54,13 @@ Tank::Tank(QGraphicsScene *scene) : QGraphicsPixmapItem(), QTimer()
     time_load_weapon->start();
 }
 
+Tank::Tank(QGraphicsScene *scene, QPointF position, qreal angle)
+    :Tank(scene)
+{
+    setPos(position);
+    setRotation(angle);
+}
+
 Tank::~Tank()
 {
     delete sound_fire;
@@ -114,6 +121,15 @@ void Tank::SetOrientation(int x, int y, double angle)
     QPointF pt(x, y);
     setPos(pt);
     setRotation(angle);
+}
+
+void Tank::SetOrientation()
+{
+    int x, y, angle;
+    x = (double) qrand()/(double) RAND_MAX * (800-50);
+    y = (double) qrand()/(double) RAND_MAX * (800-50);
+    angle = (double) qrand()/(double) RAND_MAX * 360;
+    SetOrientation(x, y, angle);
 }
 
 void Tank::Fire()
