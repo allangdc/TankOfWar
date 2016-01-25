@@ -40,10 +40,11 @@ void GameViewer::show()
     }
 }
 
-void GameViewer::setIP(bool is_server, QString ip_connect)
+void GameViewer::setIP(bool is_server, QString ip_connect, QString port)
 {
     this->is_server = is_server;
     this->ipserver = ip_connect;
+    this->port = port.toInt();
 }
 
 QString GameViewer::IP()
@@ -54,4 +55,9 @@ QString GameViewer::IP()
 bool GameViewer::IsServer()
 {
     return is_server;
+}
+
+int GameViewer::Port()
+{
+    return port;
 }

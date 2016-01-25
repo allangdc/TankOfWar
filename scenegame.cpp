@@ -46,7 +46,7 @@ void SceneGame::InitServer()
 {
     Protocol p(this);
     if(view->IsServer()) {
-        gserver = new GameServer();
+        gserver = new GameServer(view->Port());
         connect(gserver, SIGNAL(InitConnection(int)), this, SLOT(ServerInitConnection(int)));
         connect(gserver, SIGNAL(ReceiverMSG(int,QByteArray)), SLOT(ServerReceiveMSG(int,QByteArray)));
         Tank *t = CreateTank();
@@ -54,7 +54,7 @@ void SceneGame::InitServer()
     } else {
         gclient = new GameClient();
         connect(gclient, SIGNAL(ReceiverMSG(QByteArray)), this, SLOT(ClientReceiveMSG(QByteArray)));
-        gclient->connectToHost(view->IP(), 9999);
+        gclient->connectToHost(view->IP(), view->Port());
         gclient->waitForConnected();
         //p.CreateMe();
     }

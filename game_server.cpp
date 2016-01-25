@@ -4,11 +4,11 @@
 #include <QDebug>
 #include <QTcpSocket>
 
-GameServer::GameServer(QObject *parent) : QTcpServer(parent)
+GameServer::GameServer(int port, QObject *parent) : QTcpServer(parent)
 {
     connect(this, SIGNAL(newConnection()), this, SLOT(NewConnection()));
 
-    if(listen(QHostAddress::Any, 9999)) {
+    if(listen(QHostAddress::Any, port)) {
         qDebug() << "Server Started!";
     } else {
         qDebug() << "Server could not start!";

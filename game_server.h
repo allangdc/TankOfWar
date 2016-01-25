@@ -11,7 +11,7 @@ class GameServer : public QTcpServer
 {
     Q_OBJECT
 public:
-    explicit GameServer(QObject *parent = 0);
+    GameServer(int port, QObject *parent = 0);
     void ReadReady(int id, QByteArray data);
     void SendMessage(int id, QByteArray data);
     void BroadcastMessage(QByteArray data);

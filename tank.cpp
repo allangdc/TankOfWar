@@ -154,6 +154,11 @@ void Tank::Fire()
         reload_weapon = 0;
         progress_reload_weapon->SetProgress(0);
         time_load_weapon->start();
+        Protocol p(scene);
+        if(!scene->IsServer())
+            p.SendTankPosition(this, true);
+        else
+            p.GenerateMap(true, scene->id_tank);
     } else {
         reload_weapon = 0;
     }

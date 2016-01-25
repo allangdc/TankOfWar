@@ -35,7 +35,7 @@ Login::~Login()
 
 void Login::OnOkClick()
 {
-    gviewer->setIP(ui->rdServer->isChecked(), ui->txtIpServer->text());
+    gviewer->setIP(ui->rdServer->isChecked(), ui->txtIpServer->text(), ui->txtPort->text());
 }
 
 void Login::OnCancelClick()

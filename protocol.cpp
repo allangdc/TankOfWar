@@ -13,7 +13,7 @@ unsigned char Protocol::GetCode(QByteArray array)
 }
 
 
-void Protocol::GenerateMap()
+void Protocol::GenerateMap(bool fire_on, int id)
 {
     struct PTankMap pmap;
     pmap.code = SEND_MAP;
@@ -24,6 +24,11 @@ void Protocol::GenerateMap()
         ptdata->x = tank->pos().x();
         ptdata->y = tank->pos().y();
         ptdata->angle = tank->rotation();
+        ptdata->id = i;
+        if(i==id)
+            ptdata->fire_on = fire_on;
+        else
+            ptdata->fire_on = false;
     }
     const char *ch = (const char *) &pmap;
     QByteArray array(ch, sizeof(struct PTankMap));
@@ -41,9 +46,14 @@ void Protocol::ReceiveMap(QByteArray array)
             scene->CreateTank(QPointF(ptdata->x, ptdata->y),
                        ptdata->angle);
         } else {
-            Tank *t = scene->getTank(i);
-            t->setPos(ptdata->x, ptdata->y);
-            t->setRotation(ptdata->angle);
+            if(ptdata->id != scene->id_tank) {
+                Tank *t = scene->getTank(i);
+                t->setPos(ptdata->x, ptdata->y);
+                t->setRotation(ptdata->angle);
+                if(ptdata->fire_on) {
+                    t->Fire();
+                }
+            }
         }
     }
     if(!scene->HasControl()) {
@@ -64,7 +74,7 @@ void Protocol::ReceiveCreateMe()
     GenerateMap();
 }
 
-void Protocol::SendTankPosition(Tank *tank)
+void Protocol::SendTankPosition(Tank *tank, bool fire_on)
 {
     struct PTankData data;
     data.code = SEND_TANK_POSITION;
@@ -72,6 +82,7 @@ void Protocol::SendTankPosition(Tank *tank)
     data.y = tank->pos().y();
     data.angle = tank->rotation();
     data.id = scene->id_tank;
+    data.fire_on = fire_on;
     const char *ch = (const char *) &data;
     QByteArray array(ch, sizeof(struct PTankData));
     scene->gclient->SendMessage(array);
@@ -84,9 +95,12 @@ void Protocol::ReceiveTankPosition(QByteArray array)
     Tank* t = scene->getTank(data->id);
     t->setPos(data->x, data->y);
     t->setRotation(data->angle);
-
-
-    GenerateMap();
+    if(data->fire_on) {
+        t->Fire();
+        GenerateMap(true, data->id);
+    } else {
+        GenerateMap();
+    }
 }
 
 

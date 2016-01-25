@@ -12,6 +12,7 @@ struct PTankData {
     qreal x;
     qreal y;
     qreal angle;
+    bool fire_on;
     unsigned char id;
 };
 
@@ -42,11 +43,11 @@ public:
     Protocol(SceneGame *scene);
     static unsigned char GetCode(QByteArray array);
 
-    void GenerateMap();
+    void GenerateMap(bool fire_on=false, int id=0);
     void ReceiveMap(QByteArray array);
     void CreateMe();
     void ReceiveCreateMe();
-    void SendTankPosition(Tank *tank);
+    void SendTankPosition(Tank *tank, bool fire_on=false);
     void ReceiveTankPosition(QByteArray array);
 private:
     SceneGame *scene;

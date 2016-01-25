@@ -10,9 +10,10 @@ class GameViewer: public QGraphicsView
 public:
     GameViewer(bool fullscreen=false);
     void show();
-    void setIP(bool is_server, QString ip_connect);
+    void setIP(bool is_server, QString ip_connect, QString port);
     QString IP();
     bool IsServer();
+    int Port();
 protected:
     //void keyPressEvent(QKeyEvent *event);
 private:
@@ -21,6 +22,7 @@ private:
     bool fullscreen;
     bool is_server;
     QString ipserver;
+    int port;
 };
 
 #endif // GAMEVIEWER_H
