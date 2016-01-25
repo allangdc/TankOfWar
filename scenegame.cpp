@@ -44,6 +44,7 @@ SceneGame::~SceneGame()
 
 void SceneGame::InitServer()
 {
+    Protocol p(this);
     if(view->IsServer()) {
         gserver = new GameServer();
         connect(gserver, SIGNAL(InitConnection(int)), this, SLOT(ServerInitConnection(int)));
@@ -55,7 +56,7 @@ void SceneGame::InitServer()
         connect(gclient, SIGNAL(ReceiverMSG(QByteArray)), this, SLOT(ClientReceiveMSG(QByteArray)));
         gclient->connectToHost(view->IP(), 9999);
         gclient->waitForConnected();
-        gclient->write("GetID");
+        //p.CreateMe();
     }
 }
 
@@ -76,14 +77,15 @@ void SceneGame::LoadObjects()
     this->addItem(info);
     info->setPos(0, -30);
 
-    QGraphicsRectItem *rect = new QGraphicsRectItem(QRect(0,0,800,800));
+    QGraphicsRectItem*rect = new QGraphicsRectItem(QRect(0,0,800,800));
     this->addItem(rect);
-    QGraphicsLineItem *line = new QGraphicsLineItem(400,0, 400, 800);
-    this->addItem(line);
+//    QGraphicsLineItem *line = new QGraphicsLineItem(400,0, 400, 800);
+//    this->addItem(line);
 }
 
 void SceneGame::CreateControls(int id)
 {
+    id_tank = id;
     CreateControls(getTank(id));
 }
 
@@ -179,33 +181,34 @@ void SceneGame::WantClose()
 
 void SceneGame::ServerInitConnection(int id)
 {
+    Protocol p(this);
     qDebug() << "ServerInitConnection ID=" << id;
     Tank *t1 = CreateTank();
     t1->SetOrientation();
-    Protocol p(this);
-    QByteArray array = p.CreateTank(t1->x(), t1->y(), t1->rotation());
-    gserver->BroadcastMessage(array);
-    array = p.SetID(id-1);
-    gserver->SendMessage(id, array);
+    p.GenerateMap();
 }
 
 void SceneGame::ServerReceiveMSG(int id, QByteArray array)
 {
+    Protocol p(this);
 
+    switch (p.GetCode(array)) {
+        case Protocol::CREATE_ME:
+            p.ReceiveCreateMe();
+        break;
+        case Protocol::SEND_TANK_POSITION:
+            p.ReceiveTankPosition(array);
+        break;
+    }
 }
 
 void SceneGame::ClientReceiveMSG(QByteArray array)
 {
-    CCreateTank cct;
-    Tank *t;
     Protocol p(this);
 
     switch (p.GetCode(array)) {
-        case Protocol::CREATE_TANK:
-            cct = p.GetCCreateTank(array);
-        break;
-        case Protocol::ID:
-            p.GetID(array);
+        case Protocol::SEND_MAP:
+            p.ReceiveMap(array);
         break;
     }
 }
@@ -235,5 +238,20 @@ Tank *SceneGame::CreateTank(QPointF position, qreal angle)
 Tank *SceneGame::getTank(int id)
 {
     return tanks.at(id);
+}
+
+int SceneGame::NumTankOnGame()
+{
+    return tanks.size();
+}
+
+bool SceneGame::HasControl()
+{
+    return tank_buttons.size()>0?true:false;
+}
+
+bool SceneGame::IsServer()
+{
+    return view->IsServer();
 }
 

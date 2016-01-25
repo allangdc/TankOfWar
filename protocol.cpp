@@ -6,68 +6,87 @@ Protocol::Protocol(SceneGame *scene)
     this->scene = scene;
 }
 
-QByteArray Protocol::CreateTank(qreal x, qreal y, qreal angle)
-{
-    struct CCreateTank c;
-    char *ch = (char *) &c;
-    c.code = (unsigned char) CREATE_TANK;
-    c.angle = angle;
-    c.x = x;
-    c.y = y;
-    QByteArray array(ch, sizeof(CCreateTank));
-    return array;
-}
-
-QByteArray Protocol::TankAction(unsigned char tank_id, bool left, bool right, bool up, bool fire)
-{
-    struct CTankAction c;
-    char *ch = (char *) &c;
-    c.code = (unsigned char) TANK_ACTION;
-    c.tank_id = tank_id;
-    c.left = left?1:0;
-    c.right = right?1:0;
-    c.up = up?1:0;
-    c.fire = fire?1:0;
-    QByteArray array(ch, sizeof(CCreateTank));
-    return array;
-}
-
-QByteArray Protocol::SetID(unsigned char id)
-{
-    struct CId c;
-    char *ch = (char *) &c;
-    c.code = (unsigned char) ID;
-    c.id = id;
-    QByteArray array(ch, sizeof(CId));
-    return array;
-}
-
 unsigned char Protocol::GetCode(QByteArray array)
 {
     unsigned char code = (unsigned char) array.at(0);
     return code;
 }
 
-CCreateTank Protocol::GetCCreateTank(QByteArray array)
+
+void Protocol::GenerateMap()
 {
-    CCreateTank *c = (CCreateTank *) array.data();
-    scene->CreateTank(QPointF(c->x, c->y), c->angle);
-    qDebug() << "Received CreateTank (x,y,a)=" << c->x << "," << c->y << "," << c->angle;
-    return *c;
+    struct PTankMap pmap;
+    pmap.code = SEND_MAP;
+    pmap.total_tank = scene->NumTankOnGame();
+    for(int i=0; i<scene->NumTankOnGame(); i++) {
+        struct PTankData *ptdata = &(pmap.tanks[i]);
+        Tank *tank = scene->getTank(i);
+        ptdata->x = tank->pos().x();
+        ptdata->y = tank->pos().y();
+        ptdata->angle = tank->rotation();
+    }
+    const char *ch = (const char *) &pmap;
+    QByteArray array(ch, sizeof(struct PTankMap));
+    scene->gserver->BroadcastMessage(array);
 }
 
-CTankAction Protocol::GetCTankAction(QByteArray array)
+void Protocol::ReceiveMap(QByteArray array)
 {
-    CTankAction *c = (CTankAction *) array.data();
-    return *c;
+    struct PTankMap *pmap;
+    pmap = (struct PTankMap *) array.data();
+    for(int i=0; i<pmap->total_tank; i++) {
+        struct PTankData *ptdata;
+        ptdata = &(pmap->tanks[i]);
+        if(pmap->total_tank > scene->NumTankOnGame()) {
+            scene->CreateTank(QPointF(ptdata->x, ptdata->y),
+                       ptdata->angle);
+        } else {
+            Tank *t = scene->getTank(i);
+            t->setPos(ptdata->x, ptdata->y);
+            t->setRotation(ptdata->angle);
+        }
+    }
+    if(!scene->HasControl()) {
+        scene->CreateControls(pmap->total_tank-1);
+    }
 }
 
-CId Protocol::GetID(QByteArray array)
+void Protocol::CreateMe()
 {
-    CId *c = (CId *) array.data();
-    scene->CreateControls(c->id);
-    qDebug() << "Received GetID ID=" << c->id;
-    return *c;
+    unsigned char code = CREATE_ME;
+    QByteArray data((const char *) &code, sizeof(unsigned char));
+    scene->gclient->SendMessage(data);
+}
+
+void Protocol::ReceiveCreateMe()
+{
+    Tank *t = scene->CreateTank();
+    GenerateMap();
+}
+
+void Protocol::SendTankPosition(Tank *tank)
+{
+    struct PTankData data;
+    data.code = SEND_TANK_POSITION;
+    data.x = tank->pos().x();
+    data.y = tank->pos().y();
+    data.angle = tank->rotation();
+    data.id = scene->id_tank;
+    const char *ch = (const char *) &data;
+    QByteArray array(ch, sizeof(struct PTankData));
+    scene->gclient->SendMessage(array);
+}
+
+void Protocol::ReceiveTankPosition(QByteArray array)
+{
+    struct PTankData *data;
+    data = (struct PTankData *) array.data();
+    Tank* t = scene->getTank(data->id);
+    t->setPos(data->x, data->y);
+    t->setRotation(data->angle);
+
+
+    GenerateMap();
 }
 
 

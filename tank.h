@@ -24,7 +24,7 @@ enum {
     GO_STOP     = 0b10000000    //
 };
 
-class QGraphicsScene;
+class SceneGame;
 class ProgressBar;
 class Sound;
 class Bomb;
@@ -33,8 +33,8 @@ class Tank: public QTimer, public QGraphicsPixmapItem
 {
     Q_OBJECT
 public:
-    explicit Tank(QGraphicsScene *scene);
-    Tank(QGraphicsScene *scene, QPointF position, qreal angle);
+    explicit Tank(SceneGame *scene);
+    Tank(SceneGame *scene, QPointF position, qreal angle);
     virtual ~Tank();
     void RotateLeft(bool run=true);
     void RotateRight(bool run=true);
@@ -61,7 +61,7 @@ private:
     int id;
     int direction;
     bool forward;
-    QGraphicsScene *scene;
+    SceneGame *scene;
     ProgressBar *progress;
     ProgressBar *progress_reload_weapon;
     int life;

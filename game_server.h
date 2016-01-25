@@ -15,6 +15,7 @@ public:
     void ReadReady(int id, QByteArray data);
     void SendMessage(int id, QByteArray data);
     void BroadcastMessage(QByteArray data);
+    int NumConnections();
 private:
     QVector<GameSocket *> sockets;
     QMutex mutex;

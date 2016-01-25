@@ -2,15 +2,16 @@
 #include "bomb.h"
 #include "progressbar.h"
 #include "sound.h"
+#include "scenegame.h"
+#include "protocol.h"
 
 #include <QtMath>
 #include <QTime>
 #include <QObject>
-#include <QGraphicsScene>
 #include <QDebug>
 #include <QTimerEvent>
 
-Tank::Tank(QGraphicsScene *scene) : QGraphicsPixmapItem(), QTimer()
+Tank::Tank(SceneGame *scene) : QGraphicsPixmapItem(), QTimer()
 {
     setPixmap(QPixmap(TANK_IMAGE).scaled(QSize(80,80),
                                          Qt::IgnoreAspectRatio,
@@ -54,7 +55,7 @@ Tank::Tank(QGraphicsScene *scene) : QGraphicsPixmapItem(), QTimer()
     time_load_weapon->start();
 }
 
-Tank::Tank(QGraphicsScene *scene, QPointF position, qreal angle)
+Tank::Tank(SceneGame *scene, QPointF position, qreal angle)
     :Tank(scene)
 {
     setPos(position);
@@ -221,11 +222,23 @@ void Tank::timerEvent(QTimerEvent *e)
 void Tank::PulseLeft()
 {
     setRotation(rotation() - STEP_TANK);
+
+    Protocol p(scene);
+    if(!scene->IsServer())
+        p.SendTankPosition(this);
+    else
+        p.GenerateMap();
 }
 
 void Tank::PulseRight()
 {
     setRotation(rotation() + STEP_TANK);
+
+    Protocol p(scene);
+    if(!scene->IsServer())
+        p.SendTankPosition(this);
+    else
+        p.GenerateMap();
 }
 
 void Tank::PulseForward()
@@ -236,6 +249,12 @@ void Tank::PulseForward()
     pt.setY(pt.y() - STEP_TANK * qCos(radian));
     setPos(pt);
     RefactorPosition();
+
+    Protocol p(scene);
+    if(!scene->IsServer())
+        p.SendTankPosition(this);
+    else
+        p.GenerateMap();
 }
 
 void Tank::RefactorPosition()

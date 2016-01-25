@@ -31,8 +31,22 @@ public:
     void CreateControls(Tank *t);
     void CreateControls(int id);
     Tank *getTank(int id);
-protected:
+    int NumTankOnGame();
+    bool HasControl();
+
+    //Server commands
+    void ServerSendMap();
+    void ServerSendID();
+
+    //Clients commands
+    void ClientGetMap(QByteArray array);
+
+
+    GameServer *gserver;
+    GameClient *gclient;
     int id_tank=0;
+    bool IsServer();
+protected:
     QVector<Tank *> tanks;
     QVector<TankControlButton *> tank_buttons;
     virtual void keyPressEvent(QKeyEvent *event);
@@ -40,9 +54,8 @@ protected:
     void WantClose();
     GameViewer *view;
 
-    GameServer *gserver;
-    GameClient *gclient;
     qreal scale;
+    bool block_command=false;
 
 public slots:
     void ServerInitConnection(int id);
