@@ -9,6 +9,7 @@ public:
     TankControlForward(Tank *tank);
 protected:
     void Click(bool is_pressed);
+    void RefactorLimits();
 };
 
 

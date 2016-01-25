@@ -41,7 +41,7 @@ public:
     void MoveFoward(bool run=true);
     void MoveStop();
     void SetOrientation(QPoint position, double angle);
-    void SetOrientation(int x, int y, double angle);
+    void SetOrientation(qreal x, qreal y, qreal angle);
     void SetOrientation();
     int Action();
     void MoveAction(int action);
@@ -56,6 +56,7 @@ protected:
     void PulseLeft();
     void PulseRight();
     void PulseForward();
+    void RefactorPosition();
 private:
     int id;
     int direction;

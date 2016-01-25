@@ -25,6 +25,12 @@ public:
     void MoveTank(unsigned char action);
     void LoadObjects();
     void InitServer();
+
+    Tank *CreateTank();
+    Tank *CreateTank(QPointF position, qreal angle);
+    void CreateControls(Tank *t);
+    void CreateControls(int id);
+    Tank *getTank(int id);
 protected:
     int id_tank=0;
     QVector<Tank *> tanks;
@@ -36,14 +42,13 @@ protected:
 
     GameServer *gserver;
     GameClient *gclient;
+    qreal scale;
 
 public slots:
     void ServerInitConnection(int id);
     void ServerReceiveMSG(int id, QByteArray array);
     void ClientReceiveMSG(QByteArray array);
-private:
-    Tank *CreateTank();
-    void CreateControls(Tank *t);
 };
 
 #endif // SCENEGAME_H
+

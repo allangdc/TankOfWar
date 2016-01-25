@@ -116,7 +116,7 @@ void Tank::SetOrientation(QPoint position, double angle)
     SetOrientation(position.x(), position.y(), angle);
 }
 
-void Tank::SetOrientation(int x, int y, double angle)
+void Tank::SetOrientation(qreal x, qreal y, qreal angle)
 {
     QPointF pt(x, y);
     setPos(pt);
@@ -235,6 +235,19 @@ void Tank::PulseForward()
     pt.setX(pt.x() + STEP_TANK * qSin(radian));
     pt.setY(pt.y() - STEP_TANK * qCos(radian));
     setPos(pt);
+    RefactorPosition();
+}
+
+void Tank::RefactorPosition()
+{
+    if(x() + pixmap().width()/2 < 0)
+        setX(-pixmap().width()/2);
+    if(x() + pixmap().width()/2 > 800)
+        setX(800 - pixmap().width()/2);
+    if(y() + pixmap().height()/2 < 0)
+        setY(-pixmap().height()/2);
+    if(y() + pixmap().height()/2 > 800)
+        setY(800 - pixmap().height()/2);
 }
 
 void Tank::IncrementWeapon()

@@ -1,4 +1,10 @@
 #include "protocol.h"
+#include <QDebug>
+
+Protocol::Protocol(SceneGame *scene)
+{
+    this->scene = scene;
+}
 
 QByteArray Protocol::CreateTank(qreal x, qreal y, qreal angle)
 {
@@ -26,6 +32,16 @@ QByteArray Protocol::TankAction(unsigned char tank_id, bool left, bool right, bo
     return array;
 }
 
+QByteArray Protocol::SetID(unsigned char id)
+{
+    struct CId c;
+    char *ch = (char *) &c;
+    c.code = (unsigned char) ID;
+    c.id = id;
+    QByteArray array(ch, sizeof(CId));
+    return array;
+}
+
 unsigned char Protocol::GetCode(QByteArray array)
 {
     unsigned char code = (unsigned char) array.at(0);
@@ -35,12 +51,22 @@ unsigned char Protocol::GetCode(QByteArray array)
 CCreateTank Protocol::GetCCreateTank(QByteArray array)
 {
     CCreateTank *c = (CCreateTank *) array.data();
+    scene->CreateTank(QPointF(c->x, c->y), c->angle);
+    qDebug() << "Received CreateTank (x,y,a)=" << c->x << "," << c->y << "," << c->angle;
     return *c;
 }
 
 CTankAction Protocol::GetCTankAction(QByteArray array)
 {
     CTankAction *c = (CTankAction *) array.data();
+    return *c;
+}
+
+CId Protocol::GetID(QByteArray array)
+{
+    CId *c = (CId *) array.data();
+    scene->CreateControls(c->id);
+    qDebug() << "Received GetID ID=" << c->id;
     return *c;
 }
 
