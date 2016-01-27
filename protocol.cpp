@@ -13,11 +13,9 @@ unsigned char Protocol::GetCode(QByteArray array)
 }
 
 
-void Protocol::GenerateMap(bool fire_on, int id)
+void Protocol::GenerateMap()
 {
     struct PTankMap pmap;
-    pmap.code = SEND_MAP;
-    pmap.total_tank = scene->NumTankOnGame();
     for(int i=0; i<scene->NumTankOnGame(); i++) {
         struct PTankData *ptdata = &(pmap.tanks[i]);
         Tank *tank = scene->getTank(i);
@@ -25,11 +23,17 @@ void Protocol::GenerateMap(bool fire_on, int id)
         ptdata->y = tank->pos().y();
         ptdata->angle = tank->rotation();
         ptdata->id = i;
-        if(i==id)
-            ptdata->fire_on = fire_on;
-        else
-            ptdata->fire_on = false;
+        ptdata->fire_on = tank->Action() & ACT_FIRE?1:0;
+        if(tank->Action() & ACT_FIRE) {
+            int x=0;
+        }
+        ptdata->move_up = tank->Action() & MOVE_UP?1:0;
+        ptdata->move_left = tank->Action() & MOVE_LEFT?1:0;
+        ptdata->move_right = tank->Action() & MOVE_RIGHT?1:0;
     }
+    pmap.code = SEND_MAP;
+    pmap.total_tank = scene->NumTankOnGame();
+
     const char *ch = (const char *) &pmap;
     QByteArray array(ch, sizeof(struct PTankMap));
     scene->gserver->BroadcastMessage(array);
@@ -50,9 +54,28 @@ void Protocol::ReceiveMap(QByteArray array)
                 Tank *t = scene->getTank(i);
                 t->setPos(ptdata->x, ptdata->y);
                 t->setRotation(ptdata->angle);
-                if(ptdata->fire_on) {
+
+                if(ptdata->move_up == 1) {
+                    t->MoveFoward(true);
+                } else {
+                    t->MoveFoward(false);
+                }
+
+                if(ptdata->move_right == 1) {
+                    t->RotateRight(true);
+                } else {
+                    t->RotateRight(false);
+                }
+
+                if(ptdata->move_left == 1) {
+                    t->RotateLeft(true);
+                } else {
+                    t->RotateLeft(false);
+                }
+                if(ptdata->fire_on == 1) {
                     t->Fire();
                 }
+
             }
         }
     }
@@ -61,31 +84,29 @@ void Protocol::ReceiveMap(QByteArray array)
     }
 }
 
-void Protocol::CreateMe()
+void Protocol::SendTankPosition(Tank *tank, unsigned char action)
 {
-    unsigned char code = CREATE_ME;
-    QByteArray data((const char *) &code, sizeof(unsigned char));
-    scene->gclient->SendMessage(data);
-}
-
-void Protocol::ReceiveCreateMe()
-{
-    Tank *t = scene->CreateTank();
-    GenerateMap();
-}
-
-void Protocol::SendTankPosition(Tank *tank, bool fire_on)
-{
-    struct PTankData data;
-    data.code = SEND_TANK_POSITION;
-    data.x = tank->pos().x();
-    data.y = tank->pos().y();
-    data.angle = tank->rotation();
-    data.id = scene->id_tank;
-    data.fire_on = fire_on;
-    const char *ch = (const char *) &data;
-    QByteArray array(ch, sizeof(struct PTankData));
-    scene->gclient->SendMessage(array);
+    if(action & ACT_FIRE) {
+        int x=0;
+    }
+    static int i=0;
+    if (tank->SendValue()) {
+        qDebug() << "Send " << i++;
+        struct PTankData data;
+        data.code = SEND_TANK_POSITION;
+        data.x = tank->pos().x();
+        data.y = tank->pos().y();
+        data.send_value = 1;
+        data.angle = tank->rotation();
+        data.id = scene->id_tank;
+        data.fire_on = action & ACT_FIRE?1:0;
+        data.move_up = action & MOVE_UP?1:0;
+        data.move_left = action & MOVE_LEFT?1:0;
+        data.move_right = action & MOVE_RIGHT?1:0;
+        const char *ch = (const char *) &data;
+        QByteArray array(ch, sizeof(struct PTankData));
+        scene->gclient->SendMessage(array);
+    }
 }
 
 void Protocol::ReceiveTankPosition(QByteArray array)
@@ -95,11 +116,28 @@ void Protocol::ReceiveTankPosition(QByteArray array)
     Tank* t = scene->getTank(data->id);
     t->setPos(data->x, data->y);
     t->setRotation(data->angle);
-    if(data->fire_on) {
-        t->Fire();
-        GenerateMap(true, data->id);
+    t->setSendValue(false);
+
+    if(data->move_up == 1) {
+        t->MoveFoward(true);
     } else {
-        GenerateMap();
+        t->MoveFoward(false);
+    }
+
+    if(data->move_right == 1) {
+        t->RotateRight(true);
+    } else {
+        t->RotateRight(false);
+    }
+
+    if(data->move_left == 1) {
+        t->RotateLeft(true);
+    } else {
+        t->RotateLeft(false);
+    }
+
+    if(data->fire_on == 1) {
+        t->Fire();
     }
 }
 

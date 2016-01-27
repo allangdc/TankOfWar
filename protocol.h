@@ -12,8 +12,12 @@ struct PTankData {
     qreal x;
     qreal y;
     qreal angle;
-    bool fire_on;
     unsigned char id;
+    unsigned char send_value: 1;
+    unsigned char fire_on   : 1;
+    unsigned char move_up   : 1;
+    unsigned char move_left : 1;
+    unsigned char move_right: 1;
 };
 
 struct PTankMap {
@@ -22,35 +26,30 @@ struct PTankMap {
     unsigned char total_tank;
 };
 
-struct PTankCreateMe {
-    unsigned char code;
-};
-
-struct PTankID {
-    unsigned char code;
-    unsigned char id;
-};
-
 class Protocol
 {
 public:
     enum msg_list {
         SEND_MAP,
-        CREATE_ME,
-        SEND_TANK_POSITION,
-        SEND_ID
+        SEND_TANK_POSITION
+    };
+    enum direction {
+        MOVE_STOP    = 0b0000,
+        MOVE_LEFT    = 0b0001,
+        MOVE_RIGHT   = 0b0010,
+        MOVE_UP      = 0b0100,
+        ACT_FIRE     = 0b1000
     };
     Protocol(SceneGame *scene);
     static unsigned char GetCode(QByteArray array);
 
-    void GenerateMap(bool fire_on=false, int id=0);
+    void GenerateMap();
     void ReceiveMap(QByteArray array);
-    void CreateMe();
-    void ReceiveCreateMe();
-    void SendTankPosition(Tank *tank, bool fire_on=false);
+    void SendTankPosition(Tank *tank, unsigned char action);
     void ReceiveTankPosition(QByteArray array);
 private:
     SceneGame *scene;
 };
 
 #endif // PROTOCOL_H
+

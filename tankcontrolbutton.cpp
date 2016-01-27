@@ -20,6 +20,7 @@ void TankControlButton::Click(bool is_pressed)
 {
     QPixmap pxm;
     if(is_pressed) {
+        tank->setSendValue(true);
         pxm = QPixmap(BTN_SILVER).scaled(size.toSize(),
                                                Qt::IgnoreAspectRatio,
                                                Qt::SmoothTransformation);

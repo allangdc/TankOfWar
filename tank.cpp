@@ -20,6 +20,8 @@ Tank::Tank(SceneGame *scene) : QGraphicsPixmapItem(), QTimer()
     setInterval(1000.0f / qreal(FRAME_TANK));
     direction=0;
     forward = false;
+    action = 0;
+    send_value = false;
     this->scene = scene;
     // adjusting progress bars
     progress = new ProgressBar(QSize(this->pixmap().width(), this->pixmap().width()/8), this);
@@ -74,12 +76,30 @@ Tank::~Tank()
 
 void Tank::RotateLeft(bool run)
 {
+    Protocol p(scene);
     if(run) {
-        if(direction!=-1)
+        if(direction!=-1) {
+
+            action |= Protocol::MOVE_LEFT;
+            if(!scene->IsServer()) {
+                p.SendTankPosition(this, action);
+            } else {
+                p.GenerateMap();
+            }
+
             PulseLeft();
+        }
         direction = -1;
     }
     else if(direction<0) {
+
+        action &= ~Protocol::MOVE_LEFT;
+        if(!scene->IsServer()) {
+            p.SendTankPosition(this, action);
+        } else {
+            p.GenerateMap();
+        }
+
         direction = 0;
     }
     this->start();
@@ -87,12 +107,31 @@ void Tank::RotateLeft(bool run)
 
 void Tank::RotateRight(bool run)
 {
+    Protocol p(scene);
     if(run) {
-        if(direction!=1)
+        if(direction!=1) {
+
+            action |= Protocol::MOVE_RIGHT;
+            if(!scene->IsServer()) {
+                p.SendTankPosition(this, action);
+            } else {
+                p.GenerateMap();
+            }
+
             PulseRight();
+        }
         direction = 1;
     }
     else if(direction>0) {
+
+        Protocol p(scene);
+        action &= ~Protocol::MOVE_RIGHT;
+        if(!scene->IsServer()) {
+            p.SendTankPosition(this, action);
+        } else {
+            p.GenerateMap();
+        }
+
         direction = 0;
     }
     this->start();
@@ -100,14 +139,35 @@ void Tank::RotateRight(bool run)
 
 void Tank::MoveFoward(bool run)
 {
-    if(forward != run)
+    if(forward != run) {
+
+        Protocol p(scene);
+        if(run)
+            action |= Protocol::MOVE_UP;
+        else
+            action &= ~Protocol::MOVE_UP;
+        if(!scene->IsServer()) {
+            p.SendTankPosition(this, action);
+        } else {
+            p.GenerateMap();
+        }
+
+
         PulseForward();
+    }
     forward = run;
     this->start();
 }
 
 void Tank::MoveStop()
 {
+    Protocol p(scene);
+    action &= ~(Protocol::MOVE_UP | Protocol::MOVE_LEFT | Protocol::MOVE_RIGHT);
+    if(!scene->IsServer()) {
+        p.SendTankPosition(this, action);
+    } else {
+        p.GenerateMap();
+    }
     forward = false;
     direction = 0;
 }
@@ -133,8 +193,36 @@ void Tank::SetOrientation()
     SetOrientation(x, y, angle);
 }
 
+unsigned char Tank::Action()
+{
+    return action;
+}
+
+void Tank::SetAction(unsigned char action)
+{
+    this->action = action;
+}
+
+bool Tank::SendValue()
+{
+    return send_value;
+}
+
+void Tank::setSendValue(bool can_send)
+{
+    send_value = can_send;
+}
+
 void Tank::Fire()
 {
+    Protocol p(scene);
+    action |= Protocol::ACT_FIRE;
+    if(!scene->IsServer()) {
+        p.SendTankPosition(this, action);
+    } else {
+        p.GenerateMap();
+    }
+    action &= ~Protocol::ACT_FIRE;
     if (reload_weapon >= 100) {
         sound_fire->Play(FIRE_SOUND, false);
 
@@ -154,11 +242,6 @@ void Tank::Fire()
         reload_weapon = 0;
         progress_reload_weapon->SetProgress(0);
         time_load_weapon->start();
-        Protocol p(scene);
-        if(!scene->IsServer())
-            p.SendTankPosition(this, true);
-        else
-            p.GenerateMap(true, scene->id_tank);
     } else {
         reload_weapon = 0;
     }
@@ -227,23 +310,11 @@ void Tank::timerEvent(QTimerEvent *e)
 void Tank::PulseLeft()
 {
     setRotation(rotation() - STEP_TANK);
-
-    Protocol p(scene);
-    if(!scene->IsServer())
-        p.SendTankPosition(this);
-    else
-        p.GenerateMap();
 }
 
 void Tank::PulseRight()
 {
     setRotation(rotation() + STEP_TANK);
-
-    Protocol p(scene);
-    if(!scene->IsServer())
-        p.SendTankPosition(this);
-    else
-        p.GenerateMap();
 }
 
 void Tank::PulseForward()
@@ -254,12 +325,6 @@ void Tank::PulseForward()
     pt.setY(pt.y() - STEP_TANK * qCos(radian));
     setPos(pt);
     RefactorPosition();
-
-    Protocol p(scene);
-    if(!scene->IsServer())
-        p.SendTankPosition(this);
-    else
-        p.GenerateMap();
 }
 
 void Tank::RefactorPosition()

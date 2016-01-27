@@ -182,7 +182,6 @@ void SceneGame::WantClose()
 void SceneGame::ServerInitConnection(int id)
 {
     Protocol p(this);
-    qDebug() << "ServerInitConnection ID=" << id;
     Tank *t1 = CreateTank();
     t1->SetOrientation();
     p.GenerateMap();
@@ -193,9 +192,6 @@ void SceneGame::ServerReceiveMSG(int id, QByteArray array)
     Protocol p(this);
 
     switch (p.GetCode(array)) {
-        case Protocol::CREATE_ME:
-            p.ReceiveCreateMe();
-        break;
         case Protocol::SEND_TANK_POSITION:
             p.ReceiveTankPosition(array);
         break;

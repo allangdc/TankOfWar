@@ -43,8 +43,10 @@ public:
     void SetOrientation(QPoint position, double angle);
     void SetOrientation(qreal x, qreal y, qreal angle);
     void SetOrientation();
-    int Action();
-    void MoveAction(int action);
+    unsigned char Action();
+    void SetAction(unsigned char action);
+    bool SendValue();
+    void setSendValue(bool can_send);
     void Fire();
     void setPos(qreal x, qreal y);
     void setPos(QPointF point);
@@ -61,6 +63,8 @@ private:
     int id;
     int direction;
     bool forward;
+    bool send_value;
+    unsigned char action;
     SceneGame *scene;
     ProgressBar *progress;
     ProgressBar *progress_reload_weapon;

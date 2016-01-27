@@ -17,13 +17,11 @@ GameServer::GameServer(int port, QObject *parent) : QTcpServer(parent)
 
 void GameServer::ReadReady(int id, QByteArray data)
 {
-    qDebug() << "SERVER->" << QString("socket[%1] =").arg(id) << data;
     emit ReceiverMSG(id, data);
 }
 
 void GameServer::SendMessage(int id, QByteArray data)
 {
-    qDebug() << "SendMessage";
     for(QVector<GameSocket *>::iterator it = sockets.begin();
                                         it != sockets.end();
                                         it++) {
@@ -41,7 +39,6 @@ void GameServer::SendMessage(int id, QByteArray data)
 
 void GameServer::BroadcastMessage(QByteArray data)
 {
-    qDebug() << "BroadcastMessage";
     for(QVector<GameSocket *>::iterator it = sockets.begin();
                                         it != sockets.end();
                                         it++) {
